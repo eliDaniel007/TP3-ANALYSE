@@ -1,0 +1,120 @@
+<Window x:Class="PGI.ClientShoppingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Nordik Adventures - Site d'Achat" 
+        WindowState="Maximized"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        Background="#F8FAFC">
+    
+    <Window.Resources>
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Padding" Value="15,10"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Background" Value="#669BBC"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="8" 
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    
+    <Grid>
+        <!-- Header -->
+        <Border Background="#003049" Height="70" VerticalAlignment="Top">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <TextBlock Text="🛒 Nordik Adventures - Site d'Achat" 
+                         FontSize="24" 
+                         FontWeight="Bold" 
+                         Foreground="White" 
+                         VerticalAlignment="Center"
+                         Margin="30,0"/>
+                
+                <StackPanel Orientation="Horizontal" 
+                          Grid.Column="1" 
+                          VerticalAlignment="Center" 
+                          Margin="0,0,30,0">
+                    <TextBlock x:Name="WelcomeText" 
+                             Text="Bienvenue" 
+                             FontSize="14" 
+                             Foreground="White" 
+                             VerticalAlignment="Center"
+                             Margin="0,0,20,0"/>
+                    <Button x:Name="LogoutButton" 
+                          Content="🚪 Déconnexion" 
+                          Style="{StaticResource ModernButton}"
+                          Background="#780000"
+                          Click="LogoutButton_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+        
+        <!-- Contenu principal -->
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,70,0,0">
+            <StackPanel Margin="40" VerticalAlignment="Top">
+                <TextBlock Text="Bienvenue sur notre site d'achat ! 🎉" 
+                         FontSize="28" 
+                         FontWeight="Bold" 
+                         Foreground="#003049"
+                         Margin="0,0,0,20"/>
+                
+                <TextBlock Text="Cette page est en cours de développement. Vous pourrez bientôt parcourir nos produits et passer des commandes." 
+                         FontSize="16" 
+                         Foreground="#64748B"
+                         TextWrapping="Wrap"
+                         Margin="0,0,0,30"/>
+                
+                <Border Background="White" 
+                      CornerRadius="12" 
+                      Padding="30"
+                      BorderBrush="#669BBC"
+                      BorderThickness="2">
+                    <StackPanel>
+                        <TextBlock Text="📦 Fonctionnalités à venir :" 
+                                 FontSize="18" 
+                                 FontWeight="Bold" 
+                                 Foreground="#003049"
+                                 Margin="0,0,0,15"/>
+                        
+                        <TextBlock Text="✓ Catalogue de produits" 
+                                 FontSize="14" 
+                                 Foreground="#475569"
+                                 Margin="0,0,0,10"/>
+                        <TextBlock Text="✓ Panier d'achat" 
+                                 FontSize="14" 
+                                 Foreground="#475569"
+                                 Margin="0,0,0,10"/>
+                        <TextBlock Text="✓ Passer commande" 
+                                 FontSize="14" 
+                                 Foreground="#475569"
+                                 Margin="0,0,0,10"/>
+                        <TextBlock Text="✓ Suivi de commandes" 
+                                 FontSize="14" 
+                                 Foreground="#475569"
+                                 Margin="0,0,0,10"/>
+                        <TextBlock Text="✓ Historique des achats" 
+                                 FontSize="14" 
+                                 Foreground="#475569"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>
+

@@ -208,9 +208,9 @@
                     
                     <Border Background="Transparent" CornerRadius="12" Padding="20" BorderBrush="#FFFFFF66" BorderThickness="2">
                         <StackPanel>
-                            <TextBlock Text="✓ Accès instantané au PGI" Foreground="White" FontSize="14" FontWeight="Medium" Margin="0,0,0,12"/>
-                            <TextBlock Text="✓ Interface moderne et intuitive" Foreground="White" FontSize="14" FontWeight="Medium" Margin="0,0,0,12"/>
-                            <TextBlock Text="✓ Gestion complète de votre entreprise" Foreground="White" FontSize="14" FontWeight="Medium"/>
+                            <TextBlock Text="✓ Accès au site d'achat" Foreground="White" FontSize="14" FontWeight="Medium" Margin="0,0,0,12"/>
+                            <TextBlock Text="✓ Commandes faciles et rapides" Foreground="White" FontSize="14" FontWeight="Medium" Margin="0,0,0,12"/>
+                            <TextBlock Text="✓ Suivi de vos commandes" Foreground="White" FontSize="14" FontWeight="Medium"/>
                         </StackPanel>
                     </Border>
                 </StackPanel>
@@ -258,36 +258,25 @@
                         </Button>
                         
                         <!-- Titre -->
-                        <TextBlock Text="Créer un compte 📝" 
+                        <TextBlock Text="Créer un compte client 📝" 
                                  FontSize="26" 
                                  FontWeight="Bold" 
                                  Foreground="#1F2937"
                                  Margin="0,20,0,8"/>
                         
-                        <TextBlock Text="Remplissez le formulaire pour vous inscrire" 
+                        <TextBlock Text="Remplissez le formulaire pour créer votre compte client" 
                                  FontSize="13" 
                                  Foreground="#64748B"
                                  Margin="0,0,0,24"/>
                         
-                        <!-- Nom -->
-                        <TextBlock Text="Nom *" 
+                        <!-- Nom complet -->
+                        <TextBlock Text="Nom complet *" 
                                  FontSize="12" 
                                  FontWeight="SemiBold" 
                                  Foreground="#475569"
                                  Margin="0,0,0,6"/>
                         
                         <TextBox x:Name="NomTextBox" 
-                                 Style="{StaticResource ModernTextBox}"
-                                 Margin="0,0,0,16"/>
-                        
-                        <!-- Prénom -->
-                        <TextBlock Text="Prénom *" 
-                                 FontSize="12" 
-                                 FontWeight="SemiBold" 
-                                 Foreground="#475569"
-                                 Margin="0,0,0,6"/>
-                        
-                        <TextBox x:Name="PrenomTextBox" 
                                  Style="{StaticResource ModernTextBox}"
                                  Margin="0,0,0,16"/>
                         
@@ -302,53 +291,16 @@
                                  Style="{StaticResource ModernTextBox}"
                                  Margin="0,0,0,16"/>
                         
-                        <!-- Rôle -->
-                        <TextBlock Text="Rôle *" 
+                        <!-- Téléphone -->
+                        <TextBlock Text="Téléphone" 
                                  FontSize="12" 
                                  FontWeight="SemiBold" 
                                  Foreground="#475569"
                                  Margin="0,0,0,6"/>
                         
-                        <ComboBox x:Name="RoleComboBox" 
-                                  Style="{StaticResource ModernComboBox}"
-                                  FontSize="14"
-                                  Padding="12,10"
-                                  BorderBrush="#669BBC"
-                                  BorderThickness="2"
-                                  Background="White"
-                                  Foreground="#003049"
-                                  Margin="0,0,0,16">
-                            <ComboBoxItem Content="Admin" IsSelected="True"/>
-                            <ComboBoxItem Content="Gestionnaire"/>
-                            <ComboBoxItem Content="Employé"/>
-                            <ComboBoxItem Content="Comptable"/>
-                        </ComboBox>
-                        
-                        <!-- Département -->
-                        <TextBlock Text="Département *" 
-                                 FontSize="12" 
-                                 FontWeight="SemiBold" 
-                                 Foreground="#475569"
-                                 Margin="0,0,0,6"/>
-                        
-                        <ComboBox x:Name="DepartementComboBox" 
-                                  Style="{StaticResource ModernComboBox}"
-                                  FontSize="14"
-                                  Padding="12,10"
-                                  BorderBrush="#669BBC"
-                                  BorderThickness="2"
-                                  Background="White"
-                                  Foreground="#003049"
-                                  Margin="0,0,0,16">
-                            <ComboBoxItem Content="Direction" IsSelected="True"/>
-                            <ComboBoxItem Content="Finances"/>
-                            <ComboBoxItem Content="Stocks et Inventaire"/>
-                            <ComboBoxItem Content="Service Client (CRM)"/>
-                            <ComboBoxItem Content="Ventes"/>
-                            <ComboBoxItem Content="Achats"/>
-                            <ComboBoxItem Content="Ressources Humaines"/>
-                            <ComboBoxItem Content="Informatique"/>
-                        </ComboBox>
+                        <TextBox x:Name="TelephoneTextBox" 
+                                 Style="{StaticResource ModernTextBox}"
+                                 Margin="0,0,0,16"/>
                         
                         <!-- Mot de passe -->
                         <TextBlock Text="Mot de passe *" 

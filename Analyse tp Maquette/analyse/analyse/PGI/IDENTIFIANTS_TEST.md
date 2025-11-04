@@ -1,137 +1,112 @@
-# 🔐 Identifiants de Test - PGI Nordik Adventures
+# 🔐 Identifiants de Test - NordikAdventuresERP
 
-## Mode Maquette (Sans Base de Données)
+## 📋 Vue d'ensemble
 
-Le système utilise actuellement des identifiants de test **codés en dur** pour les démonstrations et maquettes.
-
----
-
-## 👥 Comptes Utilisateurs de Test
-
-### 1️⃣ **Administrateur**
-- **Nom d'utilisateur :** `admin`
-- **Mot de passe :** `admin`
-- **Rôle :** Admin
-- **Accès :** ✅ Tous les modules (Stocks, Finances, CRM)
-
-### 2️⃣ **Gestionnaire**
-- **Nom d'utilisateur :** `gestionnaire`
-- **Mot de passe :** `gestionnaire`
-- **Rôle :** Gestionnaire
-- **Accès :** ✅ Tous les modules (Stocks, Finances, CRM)
-
-### 3️⃣ **Employé**
-- **Nom d'utilisateur :** `employe`
-- **Mot de passe :** `employe`
-- **Rôle :** Employe
-- **Accès :** 
-  - ✅ MODULE 2: Finances & Facturation
-  - ✅ MODULE 3: CRM
-  - ❌ MODULE 1: Stocks & Produits (réservé au gestionnaire)
-
-### 4️⃣ **Comptable**
-- **Nom d'utilisateur :** `comptable`
-- **Mot de passe :** `comptable`
-- **Rôle :** Comptable
-- **Accès :** 
-  - ✅ MODULE 2: Finances & Facturation
-  - ❌ MODULE 1: Stocks & Produits (réservé au gestionnaire)
-  - ❌ MODULE 3: CRM (réservé au gestionnaire et employé)
+Le système distingue **deux types d'utilisateurs** :
+- **👔 Employés** : Ajoutés par l'admin dans le système, accèdent au **PGI**
+- **🛒 Clients** : S'inscrivent via le site, accèdent au **site d'achat**
 
 ---
 
-## 🎯 Règles d'Accès par Rôle
+## 👔 EMPLOYÉS (Accès au PGI)
 
-⚠️ **MODE MAQUETTE : Tous les utilisateurs ont accès à TOUS les modules**
+Les employés sont ajoutés dans le système par l'administrateur. Ils utilisent leur **nom d'utilisateur** (matricule ou email) pour se connecter.
 
-| Rôle | MODULE 1 (Stocks) | MODULE 2 (Finances) | MODULE 3 (CRM) |
-|------|-------------------|---------------------|----------------|
-| **Admin** | ✅ Oui | ✅ Oui | ✅ Oui |
-| **Gestionnaire** | ✅ Oui | ✅ Oui | ✅ Oui |
-| **Employé** | ✅ Oui | ✅ Oui | ✅ Oui |
-| **Comptable** | ✅ Oui | ✅ Oui | ✅ Oui |
+### Comptes de test disponibles :
 
-> 📝 **Note :** En mode maquette, la gestion des droits d'accès est désactivée. Tous les comptes peuvent accéder à tous les modules. Les restrictions seront implémentées lors du développement du backend.
+| Username | Mot de passe | Rôle | Accès |
+|----------|-------------|------|-------|
+| `admin` | `admin123` | Administrateur | Tous les modules |
+| `gestionnaire` | `gestionnaire123` | Gestionnaire | Tous les modules |
+| `employe` | `employe123` | Employé Ventes | Modules selon permissions |
+| `comptable` | `comptable123` | Comptable | Module Finances principalement |
 
----
+### Comment tester :
 
-## 🚀 Comment Tester
-
-### Étape 1 : Lancer l'application
-```powershell
-cd analyse/analyse/PGI
-dotnet run
-```
-
-### Étape 2 : Page de connexion
-1. Entrez un des identifiants ci-dessus
-2. Cliquez sur **"Se connecter"**
-
-### Étape 3 : Sélection du module
-Après la connexion, vous arrivez sur une page avec **3 boutons** :
-
-```
-┌──────────────────┐   ┌──────────────────┐   ┌──────────────────┐
-│  MODULE 1        │   │  MODULE 2        │   │  MODULE 3        │
-│  📦              │   │  💰              │   │  👥              │
-│  Stocks &        │   │  Finances &      │   │  Gestion         │
-│  Produits        │   │  Facturation     │   │  Relation Client │
-│                  │   │                  │   │                  │
-│  Gestionnaire    │   │  Accessible      │   │  Gestionnaire &  │
-│  uniquement      │   │  à tous          │   │  Employé         │
-└──────────────────┘   └──────────────────┘   └──────────────────┘
-```
-
-- Les boutons **grisés** ou **masqués** = Accès refusé pour votre rôle
-- Les boutons **visibles et colorés** = Accès autorisé
-
-### Étape 4 : Accéder au module
-Cliquez sur le bouton du module désiré → Vous accédez au module complet
+1. Ouvrir l'application
+2. Entrer un **username** et **mot de passe** d'employé
+3. ✅ **Résultat** : Redirection vers `ModuleSelectionWindow` (choix du module PGI)
 
 ---
 
-## 📝 Exemples de Tests
+## 🛒 CLIENTS (Accès au site d'achat)
 
-### Test 1 : Gestionnaire (Accès Complet)
-```
-Identifiant: gestionnaire / gestionnaire
-→ Voit les 3 modules
-→ Peut accéder à Stocks, Finances et CRM
-```
+Les clients s'inscrivent via la page d'inscription (`RegisterWindow`). Ils utilisent leur **email** comme identifiant.
 
-### Test 2 : Employé (Accès Limité)
-```
-Identifiant: employe / employe
-→ Voit uniquement Finances et CRM
-→ Le module Stocks est masqué
-```
+### Comptes de test disponibles :
 
-### Test 3 : Comptable (Finances Uniquement)
+| Email | Mot de passe | Nom | Type |
+|-------|-------------|-----|------|
+| `client1@test.com` | `client123` | Jean Dupont | Particulier |
+| `client2@test.com` | `client123` | Marie Martin | Particulier |
+| `client3@test.com` | `client123` | Pierre Tremblay | Particulier |
+
+### Comment tester :
+
+1. **Option 1 : Utiliser un compte existant**
+   - Ouvrir l'application
+   - Entrer un **email client** et **mot de passe**
+   - ✅ **Résultat** : Redirection vers `ClientShoppingWindow` (site d'achat)
+
+2. **Option 2 : Créer un nouveau compte**
+   - Ouvrir l'application
+   - Cliquer sur "S'inscrire"
+   - Remplir le formulaire (Nom, Email, Téléphone, Mot de passe)
+   - ✅ **Résultat** : Compte créé, retour à la page de connexion
+
+---
+
+## 🔄 Flux de navigation
+
 ```
-Identifiant: comptable / comptable
-→ Voit uniquement le module Finances
-→ Les modules Stocks et CRM sont masqués
+┌─────────────────┐
+│  LOGIN WINDOW   │
+└────────┬────────┘
+         │
+         ├─ Employé → ModuleSelectionWindow → MainWindow (PGI)
+         │
+         └─ Client → ClientShoppingWindow (Site d'achat)
 ```
 
 ---
 
-## 🔄 Déconnexion
+## 📝 Notes importantes
 
-Sur la page de sélection des modules, cliquez sur le bouton **"🔓 Se déconnecter"** en bas de page pour revenir à l'écran de connexion.
+### Pour les employés :
+- ✅ Les employés sont ajoutés dans la table `employes` par l'admin
+- ✅ Leurs mots de passe sont hashés avec SHA2 (256 bits)
+- ✅ Ils accèdent au PGI via `ModuleSelectionWindow`
+
+### Pour les clients :
+- ✅ Les clients s'inscrivent via `RegisterWindow`
+- ⚠️ **Actuellement** : Les mots de passe clients sont vérifiés dans le code C# (dictionnaire)
+- ⚠️ **Pour la production** : Ajouter une colonne `mot_de_passe_hash` dans la table `clients`
+- ✅ Ils accèdent au site d'achat via `ClientShoppingWindow`
 
 ---
 
-## ⚠️ Important
+## 🗄️ Base de données
 
-- **Ces identifiants sont uniquement pour les maquettes**
-- **Aucune base de données n'est utilisée** (données codées en dur)
-- **En production, utilisez une vraie base de données avec mots de passe hachés**
-- Le bouton "Créer un compte" (inscription) n'est **pas fonctionnel** en mode maquette
+### Tables utilisées :
+- `employes` : Employés avec accès au PGI
+- `clients` : Clients avec accès au site d'achat
+
+### Scripts SQL :
+- `SQL_Authentification.sql` : Structure des tables (si nécessaire)
+- `SQL_Utilisateurs_Test.sql` : Données de test (employés + clients)
 
 ---
 
-## 📅 Date de Création
-**Version:** Maquette v1.0  
-**Date:** Novembre 2025  
-**Mode:** Sans base de données (Identifiants en dur)
+## 🚀 Développement futur
 
+### À implémenter :
+1. ✅ Connexion à la base de données MySQL pour vérifier les identifiants
+2. ✅ Hash des mots de passe clients dans la table `clients`
+3. ✅ Gestion des sessions utilisateurs
+4. ✅ Logs des connexions
+5. ✅ Récupération de mot de passe
+6. ✅ Validation email lors de l'inscription
+
+---
+
+**Dernière mise à jour** : Janvier 2025

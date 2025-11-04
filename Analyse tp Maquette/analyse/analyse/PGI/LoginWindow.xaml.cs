@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
 
@@ -41,16 +42,34 @@ namespace PGI
 
             try
             {
-                // === AUTHENTIFICATION DÉSACTIVÉE ===
-                // Tous les utilisateurs peuvent se connecter avec n'importe quels identifiants
-                // Rôle par défaut : Admin (tous les accès)
+                // === AUTHENTIFICATION SIMPLIFIÉE ===
+                // Mode développement : vérification basique avec données de test
                 
-                string role = "Administrateur";
-                
-                // Ouvrir la fenêtre de sélection du module
+                // Vérifier si c'est un employé (identifiants de test)
+                if (IsEmployee(username, password))
+                {
+                    // C'est un employé → Rediriger vers le PGI
+                    string role = GetEmployeeRole(username);
                     ModuleSelectionWindow moduleWindow = new ModuleSelectionWindow(username, role);
                     moduleWindow.Show();
                     this.Close();
+                    return;
+                }
+                
+                // Vérifier si c'est un client (identifiants de test)
+                if (IsClient(username, password))
+                {
+                    // C'est un client → Rediriger vers le site d'achat
+                    string clientName = GetClientName(username);
+                    string clientEmail = username; // Email utilisé comme username pour les clients
+                    ClientShoppingWindow shoppingWindow = new ClientShoppingWindow(clientName, clientEmail);
+                    shoppingWindow.Show();
+                    this.Close();
+                    return;
+                }
+                
+                // Aucun utilisateur trouvé
+                ShowError("Identifiants incorrects. Veuillez réessayer.");
             }
             catch (Exception ex)
             {
@@ -61,6 +80,68 @@ namespace PGI
                 LoginButton.IsEnabled = true;
                 LoginButton.Content = "🔐 Se connecter";
             }
+        }
+
+        // Vérifier si c'est un employé (données de test)
+        private bool IsEmployee(string username, string password)
+        {
+            // Employés de test
+            var employees = new Dictionary<string, string>
+            {
+                { "admin", "admin123" },
+                { "gestionnaire", "gestionnaire123" },
+                { "employe", "employe123" },
+                { "comptable", "comptable123" }
+            };
+            
+            return employees.ContainsKey(username.ToLower()) && 
+                   employees[username.ToLower()] == password;
+        }
+
+        // Obtenir le rôle d'un employé
+        private string GetEmployeeRole(string username)
+        {
+            var roles = new Dictionary<string, string>
+            {
+                { "admin", "Administrateur" },
+                { "gestionnaire", "Gestionnaire" },
+                { "employe", "Employé" },
+                { "comptable", "Comptable" }
+            };
+            
+            return roles.ContainsKey(username.ToLower()) 
+                ? roles[username.ToLower()] 
+                : "Employé";
+        }
+
+        // Vérifier si c'est un client (données de test)
+        private bool IsClient(string username, string password)
+        {
+            // Clients de test (email comme username)
+            var clients = new Dictionary<string, (string password, string name)>
+            {
+                { "client1@test.com", ("client123", "Jean Dupont") },
+                { "client2@test.com", ("client123", "Marie Martin") },
+                { "client3@test.com", ("client123", "Pierre Tremblay") }
+            };
+            
+            return clients.ContainsKey(username.ToLower()) && 
+                   clients[username.ToLower()].password == password;
+        }
+
+        // Obtenir le nom d'un client
+        private string GetClientName(string username)
+        {
+            var clients = new Dictionary<string, string>
+            {
+                { "client1@test.com", "Jean Dupont" },
+                { "client2@test.com", "Marie Martin" },
+                { "client3@test.com", "Pierre Tremblay" }
+            };
+            
+            return clients.ContainsKey(username.ToLower()) 
+                ? clients[username.ToLower()] 
+                : username;
         }
 
         private void RegisterLink_Click(object sender, MouseButtonEventArgs e)
