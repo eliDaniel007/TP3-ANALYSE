@@ -1,0 +1,393 @@
+<UserControl x:Class="PGI.Views.Finances.FinancesDashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignHeight="900" d:DesignWidth="1100"
+             Background="Transparent">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="30">
+            <!-- Section 1 : KPIs -->
+            <TextBlock Text="Indicateurs Clés" FontSize="20" FontWeight="SemiBold" Foreground="#003049" Margin="0,0,0,20"/>
+            
+            <Grid Margin="0,0,0,30">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- KPI 1: Ventes (30 jours) -->
+                <Border Grid.Column="0" Background="#EEF2FF" CornerRadius="10" Padding="20" Margin="0,0,12,0">
+                    <StackPanel>
+                        <TextBlock Text="💰 Ventes (30 jours)" FontSize="12" Foreground="#64748B" Margin="0,0,0,8"/>
+                        <TextBlock Text="125 450 $" FontSize="24" FontWeight="Bold" Foreground="#003049"/>
+                        <TextBlock Text="↗ +12% vs mois dernier" FontSize="10" Foreground="#10B981" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+                
+                <!-- KPI 2: Profit Net (30 jours) -->
+                <Border Grid.Column="1" Background="#F0FDF4" CornerRadius="10" Padding="20" Margin="0,0,12,0">
+                    <StackPanel>
+                        <TextBlock Text="📊 Profit Net (30 jours)" FontSize="12" Foreground="#64748B" Margin="0,0,0,8"/>
+                        <TextBlock Text="42 850 $" FontSize="24" FontWeight="Bold" Foreground="#10B981"/>
+                        <TextBlock Text="Marge nette : 34.2%" FontSize="10" Foreground="#64748B" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+                
+                <!-- KPI 3: Factures en retard -->
+                <Border Grid.Column="2" Background="#FEE2E2" CornerRadius="10" Padding="20" Margin="0,0,12,0">
+                    <StackPanel>
+                        <TextBlock Text="⚠️ Factures en retard" FontSize="12" Foreground="#64748B" Margin="0,0,0,8"/>
+                        <TextBlock Text="7" FontSize="24" FontWeight="Bold" Foreground="#DC2626"/>
+                        <TextBlock Text="Montant dû : 18 350 $" FontSize="10" Foreground="#64748B" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+                
+                <!-- KPI 4: Commandes fournisseurs en attente -->
+                <Border Grid.Column="3" Background="#FEF3C7" CornerRadius="10" Padding="20">
+                    <StackPanel>
+                        <TextBlock Text="🛒 Commandes en attente" FontSize="12" Foreground="#64748B" Margin="0,0,0,8"/>
+                        <TextBlock Text="4" FontSize="24" FontWeight="Bold" Foreground="#F59E0B"/>
+                        <TextBlock Text="À réceptionner" FontSize="10" Foreground="#64748B" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+            
+            <!-- Section 2 : Alertes et Actions Rapides -->
+            <TextBlock Text="Alertes et Actions Rapides" FontSize="20" FontWeight="SemiBold" Foreground="#003049" Margin="0,20,0,20"/>
+            
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Factures impayées -->
+                <Border Grid.Column="0" Background="White" CornerRadius="10" Padding="20" Margin="0,0,15,0" BorderBrush="#FCA5A5" BorderThickness="2">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                            <TextBlock Text="⚠️ Factures impayées (plus de 30 jours)" 
+                                     FontSize="16" 
+                                     FontWeight="SemiBold" 
+                                     Foreground="#DC2626"
+                                     VerticalAlignment="Center"/>
+                            <Border Background="#DC2626" CornerRadius="12" Padding="8,3" Margin="15,0,0,0">
+                                <TextBlock Text="7 factures" FontSize="11" FontWeight="SemiBold" Foreground="White"/>
+                            </Border>
+                        </StackPanel>
+                        
+                        <!-- Tableau des factures impayées -->
+                        <DataGrid AutoGenerateColumns="False" 
+                                RowHeight="40"
+                                HeadersVisibility="Column"
+                                GridLinesVisibility="None"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                CanUserAddRows="False"
+                                CanUserDeleteRows="False"
+                                IsReadOnly="True"
+                                SelectionMode="Single"
+                                FontSize="13"
+                                Margin="0,0,0,15">
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="Background" Value="#FEF2F2"/>
+                                    <Setter Property="Foreground" Value="#991B1B"/>
+                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                    <Setter Property="FontSize" Value="12"/>
+                                    <Setter Property="Padding" Value="10,8"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="N° Facture" Binding="{Binding NumeroFacture}" Width="110"/>
+                                <DataGridTextColumn Header="Client" Binding="{Binding Client}" Width="*"/>
+                                <DataGridTextColumn Header="Montant dû" Binding="{Binding MontantDu}" Width="100"/>
+                                <DataGridTextColumn Header="Jours de retard" Binding="{Binding JoursRetard}" Width="120"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        
+                        <Button Content="📋 Voir toutes les factures impayées" 
+                                Background="#669BBC" 
+                                Foreground="White"
+                                BorderThickness="0"
+                                Padding="15,10"
+                                FontSize="13"
+                                FontWeight="Medium"
+                                Cursor="Hand"
+                                HorizontalAlignment="Left"
+                                Click="BtnViewUnpaidInvoices_Click">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}" 
+                                                        CornerRadius="8"
+                                                        Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter HorizontalAlignment="Center" 
+                                                                    VerticalAlignment="Center"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#003049"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </StackPanel>
+                </Border>
+                
+                <!-- Raccourcis -->
+                <Border Grid.Column="1" Background="White" CornerRadius="10" Padding="20">
+                    <StackPanel>
+                        <TextBlock Text="🚀 Raccourcis" FontSize="16" FontWeight="SemiBold" Foreground="#003049" Margin="0,0,0,15"/>
+                        
+                        <Button Content="➕ Enregistrer une vente" 
+                                Background="#10B981" 
+                                Foreground="White"
+                                BorderThickness="0"
+                                Padding="15,12"
+                                FontSize="13"
+                                FontWeight="Medium"
+                                Cursor="Hand"
+                                Margin="0,0,0,10"
+                                Click="BtnNewSale_Click">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}" 
+                                                        CornerRadius="8"
+                                                        Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter HorizontalAlignment="Center" 
+                                                                    VerticalAlignment="Center"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#059669"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        
+                        <Button Content="➕ Commande fournisseur" 
+                                Background="#669BBC" 
+                                Foreground="White"
+                                BorderThickness="0"
+                                Padding="15,12"
+                                FontSize="13"
+                                FontWeight="Medium"
+                                Cursor="Hand"
+                                Margin="0,0,0,10"
+                                Click="BtnNewPurchase_Click">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}" 
+                                                        CornerRadius="8"
+                                                        Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter HorizontalAlignment="Center" 
+                                                                    VerticalAlignment="Center"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#003049"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        
+                        <Button Content="💳 Enregistrer un paiement" 
+                                Background="#F59E0B" 
+                                Foreground="White"
+                                BorderThickness="0"
+                                Padding="15,12"
+                                FontSize="13"
+                                FontWeight="Medium"
+                                Cursor="Hand"
+                                Margin="0,0,0,10"
+                                Click="BtnRecordPayment_Click">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}" 
+                                                        CornerRadius="8"
+                                                        Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter HorizontalAlignment="Center" 
+                                                                    VerticalAlignment="Center"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#D97706"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        
+                        <Button Content="⚙️ Paramètres fiscaux" 
+                                Background="#669BBC" 
+                                Foreground="White"
+                                BorderThickness="0"
+                                Padding="15,12"
+                                FontSize="13"
+                                FontWeight="Medium"
+                                Cursor="Hand"
+                                Click="BtnTaxSettings_Click">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}" 
+                                                        CornerRadius="8"
+                                                        Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter HorizontalAlignment="Center" 
+                                                                    VerticalAlignment="Center"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#003049"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </StackPanel>
+                </Border>
+            </Grid>
+            
+            <!-- Section 3 : Graphique Ventes vs Dépenses -->
+            <TextBlock Text="Ventes vs Dépenses (6 derniers mois)" FontSize="20" FontWeight="SemiBold" Foreground="#003049" Margin="0,30,0,20"/>
+            
+            <Border Background="White" CornerRadius="10" Padding="30">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <!-- Légende -->
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
+                        <Border Background="#10B981" Width="20" Height="20" CornerRadius="4" Margin="0,0,10,0"/>
+                        <TextBlock Text="Ventes" FontSize="13" Foreground="#64748B" Margin="0,0,30,0" VerticalAlignment="Center"/>
+                        <Border Background="#DC2626" Width="20" Height="20" CornerRadius="4" Margin="0,0,10,0"/>
+                        <TextBlock Text="Dépenses" FontSize="13" Foreground="#64748B" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    
+                    <!-- Graphique à barres simple -->
+                    <Grid Grid.Row="1" Height="300">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <!-- Axe Y -->
+                        <StackPanel Grid.Column="0" VerticalAlignment="Stretch" Margin="0,0,15,30">
+                            <TextBlock Text="150k $" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Right" Margin="0,0,5,0"/>
+                            <TextBlock Text="120k $" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Right" Margin="0,30,5,0"/>
+                            <TextBlock Text="90k $" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Right" Margin="0,30,5,0"/>
+                            <TextBlock Text="60k $" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Right" Margin="0,30,5,0"/>
+                            <TextBlock Text="30k $" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Right" Margin="0,30,5,0"/>
+                            <TextBlock Text="0 $" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Right" Margin="0,30,5,0"/>
+                        </StackPanel>
+                        
+                        <!-- Grille de barres -->
+                        <Grid Grid.Column="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <!-- Août -->
+                            <StackPanel Grid.Column="0" VerticalAlignment="Bottom" Margin="10,0">
+                                <Grid Height="200">
+                                    <Border Background="#10B981" Height="120" VerticalAlignment="Bottom" CornerRadius="4,4,0,0" Margin="0,0,2,0"/>
+                                    <Border Background="#DC2626" Height="85" VerticalAlignment="Bottom" CornerRadius="4,4,0,0" Margin="2,0,0,0"/>
+                                </Grid>
+                                <TextBlock Text="Août" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                            </StackPanel>
+                            
+                            <!-- Septembre -->
+                            <StackPanel Grid.Column="1" VerticalAlignment="Bottom" Margin="10,0">
+                                <Grid Height="200">
+                                    <Border Background="#10B981" Height="135" VerticalAlignment="Bottom" CornerRadius="4,4,0,0" Margin="0,0,2,0"/>
+                                    <Border Background="#DC2626" Height="90" VerticalAlignment="Bottom" CornerRadius="4,4,0,0" Margin="2,0,0,0"/>
+                                </Grid>
+                                <TextBlock Text="Sept" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                            </StackPanel>
+                            
+                            <!-- Octobre -->
+                            <StackPanel Grid.Column="2" VerticalAlignment="Bottom" Margin="10,0">
+                                <Grid Height="200">
+                                    <Border Background="#10B981" Height="145" VerticalAlignment="Bottom" CornerRadius="4,4,0,0" Margin="0,0,2,0"/>
+                                    <Border Background="#DC2626" Height="95" VerticalAlignment="Bottom" CornerRadius="4,4,0,0" Margin="2,0,0,0"/>
+                                </Grid>
+                                <TextBlock Text="Oct" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                            </StackPanel>
+                            
+                            <!-- Novembre -->
+                            <StackPanel Grid.Column="3" VerticalAlignment="Bottom" Margin="10,0">
+                                <Grid Height="200">
+                                    <Border Background="#10B981" Height="155" VerticalAlignment="Bottom" CornerRadius="4,4,0,0" Margin="0,0,2,0"/>
+                                    <Border Background="#DC2626" Height="100" VerticalAlignment="Bottom" CornerRadius="4,4,0,0" Margin="2,0,0,0"/>
+                                </Grid>
+                                <TextBlock Text="Nov" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                            </StackPanel>
+                            
+                            <!-- Décembre -->
+                            <StackPanel Grid.Column="4" VerticalAlignment="Bottom" Margin="10,0">
+                                <Grid Height="200">
+                                    <Border Background="#10B981" Height="170" VerticalAlignment="Bottom" CornerRadius="4,4,0,0" Margin="0,0,2,0"/>
+                                    <Border Background="#DC2626" Height="105" VerticalAlignment="Bottom" CornerRadius="4,4,0,0" Margin="2,0,0,0"/>
+                                </Grid>
+                                <TextBlock Text="Déc" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                            </StackPanel>
+                            
+                            <!-- Janvier -->
+                            <StackPanel Grid.Column="5" VerticalAlignment="Bottom" Margin="10,0">
+                                <Grid Height="200">
+                                    <Border Background="#10B981" Height="160" VerticalAlignment="Bottom" CornerRadius="4,4,0,0" Margin="0,0,2,0"/>
+                                    <Border Background="#DC2626" Height="110" VerticalAlignment="Bottom" CornerRadius="4,4,0,0" Margin="2,0,0,0"/>
+                                </Grid>
+                                <TextBlock Text="Jan" FontSize="11" Foreground="#64748B" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
+

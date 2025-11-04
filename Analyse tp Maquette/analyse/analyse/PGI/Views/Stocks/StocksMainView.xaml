@@ -1,0 +1,92 @@
+<UserControl x:Class="PGI.Views.Stocks.StocksMainView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignHeight="800" d:DesignWidth="1200"
+             Background="Transparent">
+    
+    <UserControl.Resources>
+        <!-- Style pour les onglets de sous-navigation -->
+        <Style x:Key="SubNavButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#64748B"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="MinWidth" Value="150"/>
+            <Setter Property="Padding" Value="20,0"/>
+            <Setter Property="BorderThickness" Value="0,0,0,2"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="Border" 
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#F8FAFC"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ActiveSubNavButtonStyle" TargetType="Button" BasedOn="{StaticResource SubNavButtonStyle}">
+            <Setter Property="Foreground" Value="#003049"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderBrush" Value="#669BBC"/>
+        </Style>
+    </UserControl.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Barre de sous-navigation horizontale -->
+        <Border Grid.Row="0" Background="White" CornerRadius="12,12,0,0" Padding="0" Margin="0,0,0,0"
+                BorderBrush="#E2E8F0" BorderThickness="1,1,1,0">
+            <StackPanel Orientation="Horizontal" Margin="20,0">
+                <Button x:Name="BtnDashboard" 
+                        Content="📊 Tableau de bord" 
+                        Style="{StaticResource SubNavButtonStyle}"
+                        Click="BtnDashboard_Click"/>
+                
+                <Button x:Name="BtnProducts" 
+                        Content="📦 Produits" 
+                        Style="{StaticResource SubNavButtonStyle}"
+                        Click="BtnProducts_Click"/>
+                
+                <Button x:Name="BtnSuppliers" 
+                        Content="🏭 Fournisseurs" 
+                        Style="{StaticResource SubNavButtonStyle}"
+                        Click="BtnSuppliers_Click"/>
+                
+                <Button x:Name="BtnCategories" 
+                        Content="🏷️ Catégories" 
+                        Style="{StaticResource SubNavButtonStyle}"
+                        Click="BtnCategories_Click"/>
+            </StackPanel>
+        </Border>
+        
+        <!-- Zone de contenu pour les sous-vues -->
+        <Border Grid.Row="1" Background="White" CornerRadius="0,0,12,12" Padding="30"
+                BorderBrush="#E2E8F0" BorderThickness="1,0,1,1">
+            <Border.Effect>
+                <DropShadowEffect Color="#CBD5E1" BlurRadius="20" ShadowDepth="0" Opacity="0.4"/>
+            </Border.Effect>
+            <ContentControl x:Name="StocksContentArea"/>
+        </Border>
+    </Grid>
+</UserControl>
+

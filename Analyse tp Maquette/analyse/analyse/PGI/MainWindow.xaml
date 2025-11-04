@@ -1,0 +1,266 @@
+﻿<Window x:Class="PGI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="PGI Nordik Adventures - Système de Gestion Intégré"
+        WindowState="Maximized"
+        WindowStyle="None"
+        Background="#F8FAFC">
+    
+    <Window.Resources>
+        <!-- Style pour les boutons du menu latéral -->
+        <Style x:Key="MenuButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#475569"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Padding" Value="20,0,0,0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="Border" 
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="#669BBC"
+                                BorderThickness="0,0,0,0"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#F1F5F9"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <!-- Style pour le bouton actif -->
+        <Style x:Key="ActiveMenuButtonStyle" TargetType="Button" BasedOn="{StaticResource MenuButtonStyle}">
+            <Setter Property="Background" Value="#EEF2FF"/>
+            <Setter Property="Foreground" Value="#003049"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="Border" 
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="#669BBC"
+                                BorderThickness="0,0,3,0"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                            VerticalAlignment="Center"/>
+                            </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <!-- Style pour les TextBox -->
+        <Style TargetType="TextBox">
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="BorderBrush" Value="#CBD5E1"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <!-- Style pour les Buttons génériques -->
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="Background" Value="#669BBC"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="16,10"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="ButtonBorder" 
+                                Background="{TemplateBinding Background}" 
+                                CornerRadius="6" 
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#003049"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#CBD5E1"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <Style x:Key="SecondaryButton" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="#003049"/>
+            <Setter Property="BorderBrush" Value="#669BBC"/>
+            <Setter Property="BorderThickness" Value="2"/>
+        </Style>
+    </Window.Resources>
+    
+            <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="70"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- ========== MENU LATÉRAL GAUCHE ========== -->
+        <Border Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Background="White" BorderBrush="#E2E8F0" BorderThickness="0,0,1,0">
+            <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        
+                <!-- Logo et titre -->
+                <StackPanel Grid.Row="0" Margin="20,20,20,30">
+                    <TextBlock Text="🏢 NORDIK" 
+                             FontSize="22" 
+                             FontWeight="Bold" 
+                             Foreground="#780000"
+                             HorizontalAlignment="Left"/>
+                    <TextBlock Text="ADVENTURES" 
+                             FontSize="16" 
+                             FontWeight="SemiBold" 
+                                         Foreground="#003049" 
+                             Margin="0,-5,0,0"
+                             HorizontalAlignment="Left"/>
+                    <Border Background="#E2E8F0" Height="2" Margin="0,12,0,0"/>
+                            </StackPanel>
+                        
+                <!-- Navigation principale -->
+                <StackPanel Grid.Row="1">
+                    <Button x:Name="BtnDashboard" 
+                            Style="{StaticResource MenuButtonStyle}"
+                            Click="BtnDashboard_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🏠" FontSize="18" Margin="0,0,12,0"/>
+                            <TextBlock Text="Tableau de bord" VerticalAlignment="Center"/>
+                                </StackPanel>
+                    </Button>
+                            
+                    <Button x:Name="BtnStocks" 
+                            Style="{StaticResource MenuButtonStyle}"
+                            Click="BtnStocks_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📦" FontSize="18" Margin="0,0,12,0"/>
+                            <TextBlock Text="Stocks &amp; Produits" VerticalAlignment="Center"/>
+                                </StackPanel>
+                    </Button>
+                    
+                    <Button x:Name="BtnFinances" 
+                            Style="{StaticResource MenuButtonStyle}"
+                            Click="BtnFinances_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="💰" FontSize="18" Margin="0,0,12,0"/>
+                            <TextBlock Text="Finances" VerticalAlignment="Center"/>
+                                </StackPanel>
+                    </Button>
+                            
+                    <Button x:Name="BtnCRM" 
+                            Style="{StaticResource MenuButtonStyle}"
+                            Click="BtnCRM_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="👥" FontSize="18" Margin="0,0,12,0"/>
+                            <TextBlock Text="Clients (CRM)" VerticalAlignment="Center"/>
+                                </StackPanel>
+                    </Button>
+                    
+                    <Border Background="#E2E8F0" Height="1" Margin="15,20"/>
+                    
+                    <Button x:Name="BtnSettings" 
+                            Style="{StaticResource MenuButtonStyle}"
+                            Click="BtnSettings_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="⚙️" FontSize="18" Margin="0,0,12,0"/>
+                            <TextBlock Text="Paramètres" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                                </StackPanel>
+                            
+                <!-- Profil utilisateur et déconnexion -->
+                <StackPanel Grid.Row="2" Margin="15,0,15,20">
+                    <Border Background="#F8FAFC" CornerRadius="8" Padding="12" Margin="0,0,0,12">
+                                <StackPanel>
+                            <TextBlock x:Name="TxtUserName" Text="Admin" FontWeight="SemiBold" Foreground="#003049"/>
+                            <TextBlock x:Name="TxtUserRole" Text="Administrateur" FontSize="11" Foreground="#64748B"/>
+                                </StackPanel>
+                            </Border>
+                    <Button Content="🚪 Quitter" 
+                            Style="{StaticResource MenuButtonStyle}"
+                            Foreground="#DC2626"
+                            HorizontalContentAlignment="Center"
+                            Click="BtnLogout_Click"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                        
+        <!-- ========== HEADER SUPÉRIEUR ========== -->
+        <Border Grid.Column="1" Grid.Row="0" Background="White" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="30,0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                
+                <!-- Titre du module actuel -->
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <TextBlock x:Name="TxtModuleTitle" 
+                             Text="Tableau de bord" 
+                             FontSize="24" 
+                             FontWeight="Bold" 
+                             Foreground="#1E293B"/>
+                    <TextBlock x:Name="TxtModuleSubtitle" 
+                             Text="Vue d'ensemble de votre entreprise" 
+                             FontSize="13" 
+                             Foreground="#64748B"
+                             Margin="0,2,0,0"/>
+                    </StackPanel>
+
+                <!-- Recherche globale -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Background="#F8FAFC" CornerRadius="8" Padding="12,8" Margin="0,0,15,0">
+                    <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🔍" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBox x:Name="TxtGlobalSearch" 
+                                   Width="300" 
+                                   BorderThickness="0"
+                                   Background="Transparent"
+                                   VerticalAlignment="Center"
+                                   Text="Rechercher..." 
+                                   Foreground="#94A3B8"
+                                   GotFocus="TxtGlobalSearch_GotFocus"
+                                   LostFocus="TxtGlobalSearch_LostFocus"/>
+                                </StackPanel>
+                        </Border>
+                        
+                    <Border Background="#EEF2FF" Width="45" Height="45" CornerRadius="23" Padding="12" Cursor="Hand">
+                        <TextBlock Text="👤" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                        
+        <!-- ========== ZONE DE CONTENU DYNAMIQUE ========== -->
+        <Border Grid.Column="1" Grid.Row="1" Background="#F8FAFC" Padding="30">
+            <ContentControl x:Name="MainContentArea"/>
+                                    </Border>
+                    </Grid>
+</Window>

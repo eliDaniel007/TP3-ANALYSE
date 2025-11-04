@@ -1,0 +1,240 @@
+<Window x:Class="PGI.ModuleSelectionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Sélection du Module - PGI Nordik Adventures" 
+        WindowState="Maximized"
+        WindowStartupLocation="CenterScreen"
+        Background="#FDF0D5">
+    
+    <Window.Resources>
+        <!-- Style pour les boutons de modules -->
+        <Style x:Key="ModuleButton" TargetType="Button">
+            <Setter Property="Width" Value="320"/>
+            <Setter Property="Height" Value="250"/>
+            <Setter Property="Margin" Value="20"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderThickness" Value="3"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="#003049" BlurRadius="20" ShadowDepth="5" Opacity="0.3"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="ButtonBorder" 
+                                Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="16"
+                                Effect="{TemplateBinding Effect}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect Color="#003049" BlurRadius="30" ShadowDepth="8" Opacity="0.5"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="1.05" ScaleY="1.05"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- En-tête -->
+        <Border Grid.Row="0" Padding="0,0,0,20">
+            <Grid>
+                <Grid.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#780000" Offset="0"/>
+                        <GradientStop Color="#003049" Offset="0.5"/>
+                        <GradientStop Color="#669BBC" Offset="1"/>
+                    </LinearGradientBrush>
+                </Grid.Background>
+                
+                <StackPanel Orientation="Vertical" Margin="40,30">
+                    <TextBlock Text="BIENVENUE SUR NORDIK ADVENTURES" 
+                             Foreground="White" 
+                             FontSize="32" 
+                             FontWeight="Bold"
+                             HorizontalAlignment="Center">
+                        <TextBlock.Effect>
+                            <DropShadowEffect Color="Black" BlurRadius="8" ShadowDepth="2" Opacity="0.4"/>
+                        </TextBlock.Effect>
+                    </TextBlock>
+                    <TextBlock x:Name="WelcomeUserText"
+                             Text="Connecté en tant que: Utilisateur" 
+                             Foreground="White" 
+                             FontSize="16" 
+                             FontWeight="Medium"
+                             HorizontalAlignment="Center"
+                             Margin="0,10,0,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+        
+        <!-- Contenu principal - Sélection des modules -->
+        <Grid Grid.Row="1">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="Sélectionnez un module pour commencer" 
+                         FontSize="22" 
+                         FontWeight="SemiBold"
+                         Foreground="#003049"
+                         HorizontalAlignment="Center"
+                         Margin="0,0,0,40"/>
+                
+                <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    
+                    <!-- MODULE 1: STOCKS & PRODUITS -->
+                    <Button x:Name="BtnStocksModule" 
+                            Style="{StaticResource ModuleButton}"
+                            BorderBrush="#780000"
+                            Click="BtnStocksModule_Click">
+                        <StackPanel>
+                            <TextBlock Text="📦" FontSize="70" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                            <TextBlock Text="MODULE 1" 
+                                     FontSize="14" 
+                                     FontWeight="SemiBold"
+                                     Foreground="#780000"
+                                     HorizontalAlignment="Center"
+                                     Margin="0,0,0,8"/>
+                            <TextBlock Text="Stocks &amp; Produits" 
+                                     FontSize="20" 
+                                     FontWeight="Bold"
+                                     Foreground="#003049"
+                                     HorizontalAlignment="Center"
+                                     TextWrapping="Wrap"
+                                     TextAlignment="Center"
+                                     Margin="10,0,10,0"/>
+                            <TextBlock Text="Réservé au Gestionnaire" 
+                                     FontSize="11" 
+                                     FontStyle="Italic"
+                                     Foreground="#669BBC"
+                                     HorizontalAlignment="Center"
+                                     Margin="0,15,0,0"/>
+                        </StackPanel>
+                    </Button>
+                    
+                    <!-- MODULE 2: FINANCES & FACTURATION -->
+                    <Button x:Name="BtnFinancesModule" 
+                            Style="{StaticResource ModuleButton}"
+                            BorderBrush="#C1121F"
+                            Click="BtnFinancesModule_Click">
+                        <StackPanel>
+                            <TextBlock Text="💰" FontSize="70" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                            <TextBlock Text="MODULE 2" 
+                                     FontSize="14" 
+                                     FontWeight="SemiBold"
+                                     Foreground="#C1121F"
+                                     HorizontalAlignment="Center"
+                                     Margin="0,0,0,8"/>
+                            <TextBlock Text="Finances &amp; Facturation" 
+                                     FontSize="20" 
+                                     FontWeight="Bold"
+                                     Foreground="#003049"
+                                     HorizontalAlignment="Center"
+                                     TextWrapping="Wrap"
+                                     TextAlignment="Center"
+                                     Margin="10,0,10,0"/>
+                            <TextBlock Text="Accessible à tous" 
+                                     FontSize="11" 
+                                     FontStyle="Italic"
+                                     Foreground="#669BBC"
+                                     HorizontalAlignment="Center"
+                                     Margin="0,15,0,0"/>
+                        </StackPanel>
+                    </Button>
+                    
+                    <!-- MODULE 3: CRM -->
+                    <Button x:Name="BtnCRMModule" 
+                            Style="{StaticResource ModuleButton}"
+                            BorderBrush="#669BBC"
+                            Click="BtnCRMModule_Click">
+                        <StackPanel>
+                            <TextBlock Text="👥" FontSize="70" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                            <TextBlock Text="MODULE 3" 
+                                     FontSize="14" 
+                                     FontWeight="SemiBold"
+                                     Foreground="#669BBC"
+                                     HorizontalAlignment="Center"
+                                     Margin="0,0,0,8"/>
+                            <TextBlock Text="Gestion Relation Client" 
+                                     FontSize="20" 
+                                     FontWeight="Bold"
+                                     Foreground="#003049"
+                                     HorizontalAlignment="Center"
+                                     TextWrapping="Wrap"
+                                     TextAlignment="Center"
+                                     Margin="10,0,10,0"/>
+                            <TextBlock Text="Gestionnaire &amp; Employé" 
+                                     FontSize="11" 
+                                     FontStyle="Italic"
+                                     Foreground="#669BBC"
+                                     HorizontalAlignment="Center"
+                                     Margin="0,15,0,0"/>
+                        </StackPanel>
+                    </Button>
+                    
+                </WrapPanel>
+            </StackPanel>
+        </Grid>
+        
+        <!-- Pied de page -->
+        <Border Grid.Row="2" Background="#003049" Padding="20">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Content="🔓 Se déconnecter" 
+                        Background="#C1121F"
+                        Foreground="White"
+                        FontSize="14"
+                        FontWeight="SemiBold"
+                        Padding="20,10"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        Click="BtnLogout_Click">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Name="border" 
+                                                Background="{TemplateBinding Background}" 
+                                                CornerRadius="8"
+                                                Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="border" Property="Background" Value="#780000"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
+

@@ -1,0 +1,162 @@
+<Window x:Class="PGI.Views.Finances.TaxSettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Paramètres Fiscaux (TPS/TVQ)"
+        Height="450" Width="600"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="#F8FAFC">
+    <Border Padding="30">
+        <StackPanel>
+            <TextBlock Text="⚙️ Paramètres Fiscaux" 
+                     FontSize="24" 
+                     FontWeight="SemiBold" 
+                     Foreground="#003049"
+                     Margin="0,0,0,10"/>
+            <TextBlock Text="Configuration des taux de taxes applicables" 
+                     FontSize="13" 
+                     Foreground="#64748B"
+                     Margin="0,0,0,30"/>
+            
+            <!-- TPS -->
+            <Border Background="White" CornerRadius="10" Padding="20" Margin="0,0,0,15">
+                <StackPanel>
+                    <TextBlock Text="TPS (Taxe sur les produits et services)" 
+                             FontSize="16" 
+                             FontWeight="SemiBold" 
+                             Foreground="#003049"
+                             Margin="0,0,0,15"/>
+                    
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <TextBlock Grid.Column="0" Text="Taux actuel :" FontSize="14" Foreground="#64748B" VerticalAlignment="Center" Margin="0,0,15,0"/>
+                        <TextBox Grid.Column="1" 
+                                 x:Name="TxtTPS"
+                                 Text="5.0"
+                                 Background="White"
+                                 BorderBrush="#E2E8F0"
+                                 BorderThickness="2"
+                                 Padding="12,10"
+                                 FontSize="16"
+                                 Margin="0,0,10,0"/>
+                        <TextBlock Grid.Column="2" Text="%" FontSize="16" FontWeight="Bold" Foreground="#003049" VerticalAlignment="Center"/>
+                    </Grid>
+                    
+                    <TextBlock Text="N° d'enregistrement TPS : 123456789 RT 0001" 
+                             FontSize="12" 
+                             Foreground="#64748B"
+                             Margin="0,10,0,0"/>
+                </StackPanel>
+            </Border>
+            
+            <!-- TVQ -->
+            <Border Background="White" CornerRadius="10" Padding="20" Margin="0,0,0,30">
+                <StackPanel>
+                    <TextBlock Text="TVQ (Taxe de vente du Québec)" 
+                             FontSize="16" 
+                             FontWeight="SemiBold" 
+                             Foreground="#003049"
+                             Margin="0,0,0,15"/>
+                    
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <TextBlock Grid.Column="0" Text="Taux actuel :" FontSize="14" Foreground="#64748B" VerticalAlignment="Center" Margin="0,0,15,0"/>
+                        <TextBox Grid.Column="1" 
+                                 x:Name="TxtTVQ"
+                                 Text="9.975"
+                                 Background="White"
+                                 BorderBrush="#E2E8F0"
+                                 BorderThickness="2"
+                                 Padding="12,10"
+                                 FontSize="16"
+                                 Margin="0,0,10,0"/>
+                        <TextBlock Grid.Column="2" Text="%" FontSize="16" FontWeight="Bold" Foreground="#003049" VerticalAlignment="Center"/>
+                    </Grid>
+                    
+                    <TextBlock Text="N° d'enregistrement TVQ : 1234567890 TQ 0001" 
+                             FontSize="12" 
+                             Foreground="#64748B"
+                             Margin="0,10,0,0"/>
+                </StackPanel>
+            </Border>
+            
+            <!-- Boutons -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="💾 Enregistrer" 
+                        Background="#10B981" 
+                        Foreground="White"
+                        BorderThickness="0"
+                        Padding="20,12"
+                        FontSize="14"
+                        FontWeight="Medium"
+                        Cursor="Hand"
+                        Margin="0,0,10,0"
+                        Click="BtnSave_Click">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}" 
+                                                CornerRadius="8"
+                                                Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter HorizontalAlignment="Center" 
+                                                            VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#059669"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button Content="❌ Annuler" 
+                        Background="#E2E8F0" 
+                        Foreground="#64748B"
+                        BorderThickness="0"
+                        Padding="20,12"
+                        FontSize="14"
+                        FontWeight="Medium"
+                        Cursor="Hand"
+                        Click="BtnCancel_Click">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}" 
+                                                CornerRadius="8"
+                                                Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter HorizontalAlignment="Center" 
+                                                            VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#CBD5E1"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>
+

@@ -1,0 +1,28 @@
+<UserControl x:Class="PGI.Views.CRM.CampaignFormView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="Transparent">
+    <Grid Margin="30">
+        <StackPanel>
+            <TextBlock Text="📢 Fiche Campagne : Nouvelle Campagne" 
+                     FontSize="24" 
+                     FontWeight="SemiBold" 
+                     Foreground="#003049"
+                     Margin="0,0,0,25"/>
+            
+            <Border Background="White" CornerRadius="10" Padding="30">
+                <StackPanel>
+                    <TextBlock Text="(Formulaire : Nom, Date début/fin, Type, Audience, Objectif)" 
+                             FontSize="14" 
+                             Foreground="#64748B"
+                             TextWrapping="Wrap"/>
+                    <TextBlock Text="KPIs après la fin : Clients contactés, Taux de réponse" 
+                             FontSize="12" 
+                             Foreground="#94A3B8"
+                             Margin="0,10,0,0"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </Grid>
+</UserControl>
+

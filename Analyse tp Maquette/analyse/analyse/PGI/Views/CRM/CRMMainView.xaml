@@ -1,0 +1,74 @@
+<UserControl x:Class="PGI.Views.CRM.CRMMainView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignHeight="900" d:DesignWidth="1400"
+             Background="Transparent">
+    <UserControl.Resources>
+        <!-- Style pour les boutons de sous-navigation -->
+        <Style x:Key="SubNavButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#64748B"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="20,12"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#F1F5F9"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Style pour le bouton actif -->
+        <Style x:Key="ActiveSubNavButtonStyle" TargetType="Button" BasedOn="{StaticResource SubNavButtonStyle}">
+            <Setter Property="Foreground" Value="#003049"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0,0,0,3"/>
+            <Setter Property="BorderBrush" Value="#669BBC"/>
+        </Style>
+    </UserControl.Resources>
+
+    <DockPanel>
+        <!-- BARRE DE NAVIGATION HORIZONTALE -->
+        <Border DockPanel.Dock="Top" 
+                Background="White" 
+                BorderBrush="#E2E8F0" 
+                BorderThickness="0,0,0,1"
+                Padding="0">
+            <StackPanel Orientation="Horizontal">
+                <Button x:Name="BtnDashboard" 
+                        Content="📊 Tableau de bord" 
+                        Style="{StaticResource ActiveSubNavButtonStyle}"
+                        Click="BtnDashboard_Click"/>
+                <Button x:Name="BtnClients" 
+                        Content="👤 Clients" 
+                        Style="{StaticResource SubNavButtonStyle}"
+                        Click="BtnClients_Click"/>
+                <Button x:Name="BtnCampaigns" 
+                        Content="📢 Campagnes" 
+                        Style="{StaticResource SubNavButtonStyle}"
+                        Click="BtnCampaigns_Click"/>
+            </StackPanel>
+        </Border>
+
+        <!-- ZONE DE CONTENU DYNAMIQUE -->
+        <ContentControl x:Name="SubContentArea" Background="#F8FAFC"/>
+    </DockPanel>
+</UserControl>
+
