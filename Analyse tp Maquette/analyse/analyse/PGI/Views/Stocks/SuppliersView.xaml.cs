@@ -28,8 +28,7 @@ namespace PGI.Views.Stocks
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erreur lors du chargement des fournisseurs: {ex.Message}",
-                    "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                Console.WriteLine($"Erreur BDD (fournisseurs): {ex.Message}");
                 LoadSampleData();
             }
         }

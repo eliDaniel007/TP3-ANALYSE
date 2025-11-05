@@ -179,15 +179,16 @@
                     </Style>
                 </DataGrid.CellStyle>
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="SKU" Binding="{Binding SKU}" Width="110"/>
-                    <DataGridTextColumn Header="Nom du produit" Binding="{Binding Nom}" Width="*"/>
-                    <DataGridTextColumn Header="Catégorie" Binding="{Binding Categorie}" Width="130"/>
-                    <DataGridTextColumn Header="Fournisseur" Binding="{Binding Fournisseur}" Width="150"/>
+
+                    <DataGridTextColumn Header="SKU" Binding="{Binding SKU}" Width="150"/>
+                    <DataGridTextColumn Header="Nom du produit" Binding="{Binding Nom}" Width="300"/>
+                    <DataGridTextColumn Header="Catégorie" Binding="{Binding Categorie}" Width="220"/>
+                    <DataGridTextColumn Header="Fournisseur" Binding="{Binding Fournisseur}" Width="220"/>
                     <DataGridTextColumn Header="Prix" Binding="{Binding Prix}" Width="100"/>
                     <DataGridTextColumn Header="Coût" Binding="{Binding Cout}" Width="100"/>
                     <DataGridTextColumn Header="Stock" Binding="{Binding Stock}" Width="80"/>
                     <DataGridTextColumn Header="Seuil" Binding="{Binding Seuil}" Width="80"/>
-                    <DataGridTemplateColumn Header="Statut" Width="110">
+                    <DataGridTemplateColumn Header="Statut" Width="100">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Border Background="{Binding StatutColor}" 

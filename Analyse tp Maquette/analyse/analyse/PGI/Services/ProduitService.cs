@@ -17,20 +17,16 @@ namespace PGI.Services
             
             string query = @"
                 SELECT 
-                    p.id, p.sku, p.nom, p.description, p.cout, p.prix, p.marge_brute,
-                    p.seuil_reapprovisionnement, p.stock_minimum, p.poids_kg, p.statut,
-                    p.date_entree_stock, p.date_creation,
+                    p.*,
                     c.nom AS nom_categorie,
                     f.nom AS nom_fournisseur,
                     COALESCE(SUM(ns.qte_disponible), 0) AS stock_disponible,
-                    COALESCE(SUM(ns.qte_reservee), 0) AS stock_reserve
+                    COALESCE(SUM(ns.qte_reservee), 0) AS stock_reservee
                 FROM produits p
                 LEFT JOIN categories c ON p.categorie_id = c.id
                 LEFT JOIN fournisseurs f ON p.fournisseur_id = f.id
                 LEFT JOIN niveaux_stock ns ON p.id = ns.produit_id
-                GROUP BY p.id, p.sku, p.nom, p.description, p.cout, p.prix, p.marge_brute,
-                         p.seuil_reapprovisionnement, p.stock_minimum, p.poids_kg, p.statut,
-                         p.date_entree_stock, p.date_creation, c.nom, f.nom
+                GROUP BY p.id
                 ORDER BY p.nom";
 
             try
@@ -254,28 +250,35 @@ namespace PGI.Services
         /// </summary>
         private static Produit MapDataRowToProduit(DataRow row)
         {
-            return new Produit
+            try
             {
-                Id = Convert.ToInt32(row["id"]),
-                SKU = row["sku"].ToString(),
-                CategorieId = Convert.ToInt32(row["categorie_id"]),
-                Nom = row["nom"].ToString(),
-                Description = row["description"] != DBNull.Value ? row["description"].ToString() : string.Empty,
-                Cout = Convert.ToDecimal(row["cout"]),
-                Prix = Convert.ToDecimal(row["prix"]),
-                MargeBrute = Convert.ToDecimal(row["marge_brute"]),
-                SeuilReapprovisionnement = Convert.ToInt32(row["seuil_reapprovisionnement"]),
-                StockMinimum = Convert.ToInt32(row["stock_minimum"]),
-                PoidsKg = Convert.ToDecimal(row["poids_kg"]),
-                FournisseurId = Convert.ToInt32(row["fournisseur_id"]),
-                Statut = row["statut"].ToString(),
-                DateEntreeStock = row["date_entree_stock"] != DBNull.Value ? Convert.ToDateTime(row["date_entree_stock"]) : (DateTime?)null,
-                DateCreation = Convert.ToDateTime(row["date_creation"]),
-                NomCategorie = row["nom_categorie"] != DBNull.Value ? row["nom_categorie"].ToString() : string.Empty,
-                NomFournisseur = row["nom_fournisseur"] != DBNull.Value ? row["nom_fournisseur"].ToString() : string.Empty,
-                StockDisponible = Convert.ToInt32(row["stock_disponible"]),
-                StockReservee = Convert.ToInt32(row["stock_reservee"])
-            };
+                return new Produit
+                {
+                    Id = Convert.ToInt32(row["id"]),
+                    SKU = row["sku"]?.ToString() ?? string.Empty,
+                    CategorieId = row.Table.Columns.Contains("categorie_id") ? Convert.ToInt32(row["categorie_id"]) : 0,
+                    Nom = row["nom"]?.ToString() ?? string.Empty,
+                    Description = row["description"] != DBNull.Value ? row["description"].ToString() : string.Empty,
+                    Cout = Convert.ToDecimal(row["cout"]),
+                    Prix = Convert.ToDecimal(row["prix"]),
+                    MargeBrute = Convert.ToDecimal(row["marge_brute"]),
+                    SeuilReapprovisionnement = Convert.ToInt32(row["seuil_reapprovisionnement"]),
+                    StockMinimum = Convert.ToInt32(row["stock_minimum"]),
+                    PoidsKg = Convert.ToDecimal(row["poids_kg"]),
+                    FournisseurId = row.Table.Columns.Contains("fournisseur_id") ? Convert.ToInt32(row["fournisseur_id"]) : 0,
+                    Statut = row["statut"]?.ToString() ?? "Actif",
+                    DateEntreeStock = row["date_entree_stock"] != DBNull.Value ? Convert.ToDateTime(row["date_entree_stock"]) : (DateTime?)null,
+                    DateCreation = Convert.ToDateTime(row["date_creation"]),
+                    NomCategorie = row["nom_categorie"] != DBNull.Value ? row["nom_categorie"].ToString() : string.Empty,
+                    NomFournisseur = row["nom_fournisseur"] != DBNull.Value ? row["nom_fournisseur"].ToString() : string.Empty,
+                    StockDisponible = Convert.ToInt32(row["stock_disponible"]),
+                    StockReservee = Convert.ToInt32(row["stock_reservee"])
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erreur lors du mapping du produit (ligne {row["id"]}): {ex.Message}", ex);
+            }
         }
     }
 }

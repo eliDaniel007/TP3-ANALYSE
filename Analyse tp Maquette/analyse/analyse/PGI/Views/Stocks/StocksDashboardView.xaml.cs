@@ -24,8 +24,7 @@ namespace PGI.Views.Stocks
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erreur lors du chargement du tableau de bord : {ex.Message}",
-                    "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                Console.WriteLine($"Erreur BDD (dashboard): {ex.Message}");
                 LoadSampleData();
             }
         }

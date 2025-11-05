@@ -28,8 +28,7 @@ namespace PGI.Views.Stocks
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erreur lors du chargement des catégories: {ex.Message}",
-                    "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                Console.WriteLine($"Erreur BDD (catégories): {ex.Message}");
                 LoadSampleCategories();
             }
         }

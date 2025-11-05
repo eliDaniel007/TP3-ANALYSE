@@ -26,11 +26,14 @@ namespace PGI.Views.Stocks
                 // Charger les produits depuis la base de données
                 allProduits = ProduitService.GetAllProduits();
                 DisplayProduits(allProduits);
+                
+                // Log dans la console (pour debug)
+                Console.WriteLine($"✅ {allProduits.Count} produits chargés depuis MySQL");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erreur lors du chargement des produits: {ex.Message}", 
-                    "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                // Log de l'erreur
+                Console.WriteLine($"❌ Erreur BDD (produits): {ex.Message}");
                 
                 // Charger des données d'exemple en cas d'erreur de connexion
             LoadSampleData();
@@ -150,7 +153,7 @@ namespace PGI.Views.Stocks
                     {
                         // Supprimer de la base de données
                         bool success = ProduitService.DeleteProduit(product.Id);
-                        
+                    
                         if (success)
                     {
                             // Recharger la liste
