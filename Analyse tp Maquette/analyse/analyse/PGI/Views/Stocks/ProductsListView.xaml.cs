@@ -1,28 +1,73 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using PGI.Models;
+using PGI.Services;
 
 namespace PGI.Views.Stocks
 {
     public partial class ProductsListView : UserControl
     {
+        private List<Produit> allProduits;
+
         public ProductsListView()
         {
             InitializeComponent();
+            LoadProduits();
+        }
+
+        private void LoadProduits()
+        {
+            try
+            {
+                // Charger les produits depuis la base de données
+                allProduits = ProduitService.GetAllProduits();
+                DisplayProduits(allProduits);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erreur lors du chargement des produits: {ex.Message}", 
+                    "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                
+                // Charger des données d'exemple en cas d'erreur de connexion
             LoadSampleData();
+            }
+        }
+
+        private void DisplayProduits(List<Produit> produits)
+        {
+            // Convertir les produits en format pour affichage
+            var displayProducts = produits.Select(p => new ProductDisplay
+            {
+                Id = p.Id,
+                SKU = p.SKU,
+                Nom = p.Nom,
+                Categorie = p.NomCategorie,
+                Fournisseur = p.NomFournisseur,
+                Prix = $"{p.Prix:N2} $",
+                Cout = $"{p.Cout:N2} $",
+                Stock = p.StockDisponible.ToString(),
+                Seuil = p.SeuilReapprovisionnement.ToString(),
+                Statut = p.StockDisponible <= p.SeuilReapprovisionnement ? "À commander" : "Actif",
+                StatutColor = p.StockDisponible <= p.SeuilReapprovisionnement 
+                    ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F59E0B"))
+                    : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981"))
+            }).ToList();
+
+            ProductsDataGrid.ItemsSource = displayProducts;
         }
 
         private void LoadSampleData()
         {
-            // Données d'exemple pour la maquette
-            var products = new List<Product>
+            // Données d'exemple pour la maquette (si pas de connexion BDD)
+            var products = new List<ProductDisplay>
             {
-                new Product { SKU = "VES-001", Nom = "Veste d'hiver Nordique", Categorie = "Vêtements", Fournisseur = "Nordic Supplies", Prix = "225 $", Cout = "150 $", Stock = "45", Seuil = "20", Statut = "Actif", StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981")) },
-                new Product { SKU = "BOT-012", Nom = "Bottes de randonnée", Categorie = "Chaussures", Fournisseur = "Adventure Co.", Prix = "180 $", Cout = "110 $", Stock = "12", Seuil = "15", Statut = "À commander", StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F59E0B")) },
-                new Product { SKU = "SAC-045", Nom = "Sac à dos 45L", Categorie = "Équipement", Fournisseur = "Mountain Gear", Prix = "130 $", Cout = "80 $", Stock = "28", Seuil = "10", Statut = "Actif", StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981")) },
-                new Product { SKU = "GAN-007", Nom = "Gants thermiques", Categorie = "Accessoires", Fournisseur = "Nordic Supplies", Prix = "45 $", Cout = "25 $", Stock = "67", Seuil = "30", Statut = "Actif", StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981")) },
-                new Product { SKU = "TEN-021", Nom = "Tente 4 saisons", Categorie = "Équipement", Fournisseur = "Adventure Co.", Prix = "450 $", Cout = "280 $", Stock = "8", Seuil = "5", Statut = "Actif", StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981")) },
+                new ProductDisplay { SKU = "VES-001", Nom = "Veste d'hiver Nordique", Categorie = "Vêtements", Fournisseur = "Nordic Supplies", Prix = "225 $", Cout = "150 $", Stock = "45", Seuil = "20", Statut = "Actif", StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981")) },
+                new ProductDisplay { SKU = "BOT-012", Nom = "Bottes de randonnée", Categorie = "Chaussures", Fournisseur = "Adventure Co.", Prix = "180 $", Cout = "110 $", Stock = "12", Seuil = "15", Statut = "À commander", StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F59E0B")) },
+                new ProductDisplay { SKU = "SAC-045", Nom = "Sac à dos 45L", Categorie = "Équipement", Fournisseur = "Mountain Gear", Prix = "130 $", Cout = "80 $", Stock = "28", Seuil = "10", Statut = "Actif", StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981")) },
             };
 
             ProductsDataGrid.ItemsSource = products;
@@ -60,7 +105,7 @@ namespace PGI.Views.Stocks
         {
             // Récupérer le produit sélectionné
             var button = sender as Button;
-            var product = button?.DataContext as Product;
+            var product = button?.DataContext as ProductDisplay;
             
             if (product != null)
             {
@@ -69,6 +114,7 @@ namespace PGI.Views.Stocks
                 if (parent != null)
                 {
                     parent.NavigateToProductForm();
+                    // TODO: Passer l'ID du produit au formulaire
                     MessageBox.Show(
                         $"Modification du produit : {product.Nom}\nSKU : {product.SKU}",
                         "Édition",
@@ -83,7 +129,7 @@ namespace PGI.Views.Stocks
         {
             // Récupérer le produit sélectionné
             var button = sender as Button;
-            var product = button?.DataContext as Product;
+            var product = button?.DataContext as ProductDisplay;
             
             if (product != null)
             {
@@ -100,15 +146,15 @@ namespace PGI.Views.Stocks
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    // TODO: Supprimer de la base de données
-                    
-                    // Supprimer de la liste affichée
-                    var products = ProductsDataGrid.ItemsSource as List<Product>;
-                    if (products != null)
+                    try
                     {
-                        products.Remove(product);
-                        ProductsDataGrid.Items.Refresh();
-                    }
+                        // Supprimer de la base de données
+                        bool success = ProduitService.DeleteProduit(product.Id);
+                        
+                        if (success)
+                    {
+                            // Recharger la liste
+                            LoadProduits();
 
                     MessageBox.Show(
                         $"✅ Le produit '{product.Nom}' a été supprimé avec succès.",
@@ -116,6 +162,59 @@ namespace PGI.Views.Stocks
                         MessageBoxButton.OK,
                         MessageBoxImage.Information
                     );
+                        }
+                        else
+                        {
+                            MessageBox.Show(
+                                "❌ Erreur lors de la suppression du produit.",
+                                "Erreur",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Error
+                            );
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(
+                            $"❌ Erreur lors de la suppression : {ex.Message}",
+                            "Erreur",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Error
+                        );
+                    }
+                }
+            }
+        }
+
+        private void TxtSearch_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (TxtSearch.Text != "Rechercher par nom ou SKU..." && !string.IsNullOrWhiteSpace(TxtSearch.Text))
+            {
+                try
+                {
+                    // Rechercher dans la base de données
+                    var produits = ProduitService.SearchProduits(TxtSearch.Text);
+                    DisplayProduits(produits);
+                }
+                catch
+                {
+                    // Recherche locale en cas d'erreur
+                    if (allProduits != null)
+                    {
+                        var filtered = allProduits.Where(p =>
+                            p.Nom.Contains(TxtSearch.Text, StringComparison.OrdinalIgnoreCase) ||
+                            p.SKU.Contains(TxtSearch.Text, StringComparison.OrdinalIgnoreCase)
+                        ).ToList();
+                        DisplayProduits(filtered);
+                    }
+                }
+            }
+            else if (string.IsNullOrWhiteSpace(TxtSearch.Text) || TxtSearch.Text == "Rechercher par nom ou SKU...")
+            {
+                // Réafficher tous les produits
+                if (allProduits != null)
+                {
+                    DisplayProduits(allProduits);
                 }
             }
         }
@@ -131,9 +230,10 @@ namespace PGI.Views.Stocks
         }
     }
 
-    // Classe modèle pour les produits
-    public class Product
+    // Classe pour l'affichage des produits dans le DataGrid
+    public class ProductDisplay
     {
+        public int Id { get; set; }
         public string SKU { get; set; }
         public string Nom { get; set; }
         public string Categorie { get; set; }

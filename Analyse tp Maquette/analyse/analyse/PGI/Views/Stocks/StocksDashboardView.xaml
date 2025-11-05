@@ -61,8 +61,8 @@
                 <Border Grid.Column="1" Background="#F0FDF4" CornerRadius="10" Padding="20" Margin="0,0,12,0">
                     <StackPanel>
                         <TextBlock Text="📦 Produits actifs" FontSize="12" Foreground="#64748B" Margin="0,0,0,8"/>
-                        <TextBlock Text="247" FontSize="24" FontWeight="Bold" Foreground="#003049"/>
-                        <TextBlock Text="Dans 18 catégories" FontSize="10" Foreground="#64748B" Margin="0,4,0,0"/>
+                        <TextBlock x:Name="TxtActiveProducts" Text="247" FontSize="24" FontWeight="Bold" Foreground="#003049"/>
+                        <TextBlock Text="Dans le catalogue" FontSize="10" Foreground="#64748B" Margin="0,4,0,0"/>
                     </StackPanel>
                 </Border>
                 
@@ -70,8 +70,8 @@
                 <Border Grid.Column="2" Background="#FEF3C7" CornerRadius="10" Padding="20" Margin="0,0,12,0">
                     <StackPanel>
                         <TextBlock Text="🏭 Fournisseurs" FontSize="12" Foreground="#64748B" Margin="0,0,0,8"/>
-                        <TextBlock Text="23" FontSize="24" FontWeight="Bold" Foreground="#003049"/>
-                        <TextBlock Text="Délai moyen: 7 jours" FontSize="10" Foreground="#64748B" Margin="0,4,0,0"/>
+                        <TextBlock x:Name="TxtSuppliers" Text="23" FontSize="24" FontWeight="Bold" Foreground="#003049"/>
+                        <TextBlock Text="Partenaires actifs" FontSize="10" Foreground="#64748B" Margin="0,4,0,0"/>
                     </StackPanel>
                 </Border>
                 
@@ -79,7 +79,7 @@
                 <Border Grid.Column="3" Background="#FEE2E2" CornerRadius="10" Padding="20">
                     <StackPanel>
                         <TextBlock Text="📊 Marge brute moyenne" FontSize="12" Foreground="#64748B" Margin="0,0,0,8"/>
-                        <TextBlock Text="34.2 %" FontSize="24" FontWeight="Bold" Foreground="#003049"/>
+                        <TextBlock x:Name="TxtGrossMargin" Text="34.2 %" FontSize="24" FontWeight="Bold" Foreground="#003049"/>
                         <TextBlock Text="Sur tous les produits" FontSize="10" Foreground="#64748B" Margin="0,4,0,0"/>
                     </StackPanel>
                 </Border>

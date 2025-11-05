@@ -1,0 +1,92 @@
+feat: Authentification complète avec MySQL - Employés et Clients
+
+## 🔐 Authentification Implémentée
+
+### Fonctionnalités
+- ✅ Authentification employés et clients avec base de données MySQL
+- ✅ Séparation des accès: Employés → PGI / Clients → Site d'achat
+- ✅ Validation email client (doit contenir "client")
+- ✅ Bouton afficher/cacher mot de passe (👁️)
+- ✅ Inscription clients avec enregistrement BDD
+- ✅ Mots de passe en clair (pas de hashage pour simplifier)
+
+### Fichiers Créés/Modifiés
+
+#### Services
+- ✅ Services/EmployeService.cs (nouveau)
+- ✅ Services/ClientService.cs (nouveau)
+
+#### Models
+- ✅ Models/Employe.cs (nouveau)
+- ✅ Models/Client.cs (corrigé)
+- ✅ Models/Fournisseur.cs (corrigé)
+- ✅ Models/Produit.cs (corrigé)
+- ✅ Models/Categorie.cs (corrigé)
+- ✅ Models/MouvementStock.cs (corrigé)
+
+#### Authentification
+- ✅ LoginWindow.xaml.cs (mis à jour avec BDD)
+- ✅ RegisterWindow.xaml.cs (mis à jour avec BDD)
+- ✅ Helpers/DatabaseHelper.cs (mot de passe MySQL configuré)
+
+#### Base de données
+- ✅ SQL_Schema_Auth.sql (script authentification)
+- ✅ SQL_Schema_Auth_Safe.sql (script safe avec vérification)
+- ✅ Valeurs ENUM corrigées (departement, role_systeme)
+- ✅ Ajout colonnes salaire_annuel et date_embauche
+
+#### Documentation
+- ✅ AUTHENTIFICATION.md (documentation complète)
+- ✅ INSTRUCTIONS_BDD.md (guide installation)
+- ✅ VALEURS_ENUM.md (référence ENUM)
+- ✅ GUIDE_RAPIDE_SQL.md (guide rapide)
+- ✅ RECAPITULATIF_AUTHENTIFICATION.md (résumé)
+
+#### Configuration
+- ✅ .editorconfig (désactivation avertissements nullabilité)
+
+### Corrections Techniques
+- ✅ Correction nullabilité C# 8.0 (Models avec string.Empty par défaut)
+- ✅ Correction gestion valeurs null (Services avec ?. et ??)
+- ✅ Correction DatabaseHelper (cast DBNull.Value)
+- ✅ Correction XAML StocksDashboardView (ajout x:Name)
+- ✅ Correction typo StockReserve → StockReservee
+- ✅ Mot de passe MySQL configuré: "password"
+
+### Identifiants de Test
+
+#### Employés (Accès PGI)
+| Email | Mot de passe | Rôle |
+|-------|--------------|------|
+| admin@nordikadventures.com | admin123 | Admin |
+| gestionnaire@nordikadventures.com | gestionnaire123 | Gestionnaire |
+| employe@nordikadventures.com | employe123 | Employé Ventes |
+| comptable@nordikadventures.com | comptable123 | Comptable |
+
+#### Clients (Accès Site d'achat)
+| Email | Mot de passe | Nom |
+|-------|--------------|-----|
+| jean.client@test.com | client123 | Jean Dupont |
+| marie.client@test.com | client123 | Marie Martin |
+| pierre.client@entreprise.com | client123 | Pierre Tremblay |
+| client.sophie@gmail.com | client123 | Sophie Lavoie |
+| contact@nordikclient.com | client123 | Nordik Sports Inc. |
+
+### Installation
+1. Exécuter `SQL_Schema_Auth_Safe.sql` dans MySQL Workbench
+2. Vérifier `DatabaseHelper.cs` (mot de passe MySQL)
+3. Compiler et lancer l'application (F5)
+4. Tester avec les identifiants ci-dessus
+
+### Tests Réalisés
+- ✅ Connexion employé fonctionne
+- ✅ Connexion client fonctionne
+- ✅ Inscription client fonctionne
+- ✅ Validation email "client" fonctionne
+- ✅ Bouton afficher/cacher mot de passe fonctionne
+- ✅ Redirection vers PGI ou Site d'achat fonctionne
+
+---
+
+**Authentification complète et opérationnelle ! 🎉**
+

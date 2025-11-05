@@ -1,13 +1,13 @@
 using System;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
+using PGI.Services;
 
 namespace PGI
 {
     public partial class RegisterWindow : Window
     {
-
         public RegisterWindow()
         {
             InitializeComponent();
@@ -29,55 +29,82 @@ namespace PGI
             string password = PasswordBox.Visibility == Visibility.Visible ? PasswordBox.Password : PasswordTextBox.Text;
             string confirmPassword = ConfirmPasswordBox.Visibility == Visibility.Visible ? ConfirmPasswordBox.Password : ConfirmPasswordTextBox.Text;
 
-            // Validation
+            // Validation des champs obligatoires
             if (string.IsNullOrWhiteSpace(nom) || string.IsNullOrWhiteSpace(email) || 
                 string.IsNullOrWhiteSpace(password))
             {
-                MessageBox.Show("Veuillez remplir tous les champs obligatoires (Nom, Email, Mot de passe).", 
-                    "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ShowMessage("Veuillez remplir tous les champs obligatoires (Nom, Email, Mot de passe).", false);
                 return;
             }
 
             // Validation email basique
             if (!email.Contains("@") || !email.Contains("."))
             {
-                MessageBox.Show("Veuillez entrer une adresse email valide.", 
-                    "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ShowMessage("Veuillez entrer une adresse email valide.", false);
                 return;
             }
 
+            // Vérifier que l'email contient "client"
+            if (!email.ToLower().Contains("client"))
+            {
+                ShowMessage("❌ L'adresse email doit contenir le mot 'client'.\nExemple : jean.client@email.com", false);
+                return;
+            }
+
+            // Validation mot de passe
             if (password != confirmPassword)
             {
-                MessageBox.Show("Les mots de passe ne correspondent pas.", 
-                    "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ShowMessage("Les mots de passe ne correspondent pas.", false);
                 return;
             }
 
             if (password.Length < 6)
             {
-                MessageBox.Show("Le mot de passe doit contenir au moins 6 caractères.", 
-                    "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ShowMessage("Le mot de passe doit contenir au moins 6 caractères.", false);
                 return;
             }
 
-            // TODO: Enregistrer le client dans la base de données
-            // Pour l'instant, simulation d'inscription réussie
-            
-            MessageBox.Show(
-                $"✅ Inscription réussie !\n\n" +
-                $"Nom : {nom}\n" +
-                $"Email : {email}\n" +
-                $"Téléphone : {(string.IsNullOrWhiteSpace(telephone) ? "Non renseigné" : telephone)}\n\n" +
-                $"Vous pouvez maintenant vous connecter pour accéder au site d'achat.",
-                "Succès",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information
-            );
+            // Désactiver le bouton pendant l'inscription
+            RegisterButton.IsEnabled = false;
+            RegisterButton.Content = "⏳ Inscription en cours...";
 
-            // Retour à la page de connexion
-            LoginWindow loginWindow = new LoginWindow();
-            loginWindow.Show();
-            this.Close();
+            try
+            {
+                // === ENREGISTREMENT DANS LA BASE DE DONNÉES ===
+                var (success, message, clientId) = ClientService.Register(nom, email, telephone, password);
+
+                if (success)
+                {
+                    MessageBox.Show(
+                        $"✅ Inscription réussie !\n\n" +
+                        $"Nom : {nom}\n" +
+                        $"Email : {email}\n" +
+                        $"Téléphone : {(string.IsNullOrWhiteSpace(telephone) ? "Non renseigné" : telephone)}\n\n" +
+                        $"Vous pouvez maintenant vous connecter pour accéder au site d'achat.",
+                        "Inscription réussie",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information
+                    );
+
+                    // Retour à la page de connexion
+                    LoginWindow loginWindow = new LoginWindow();
+                    loginWindow.Show();
+                    this.Close();
+                }
+                else
+                {
+                    ShowMessage(message, false);
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowMessage($"❌ Erreur lors de l'inscription : {ex.Message}", false);
+            }
+            finally
+            {
+                RegisterButton.IsEnabled = true;
+                RegisterButton.Content = "✨ Créer mon compte";
+            }
         }
 
         private void TogglePasswordButton_Click(object sender, RoutedEventArgs e)
@@ -92,7 +119,7 @@ namespace PGI
             else
             {
                 PasswordBox.Password = PasswordTextBox.Text;
-                PasswordTextBox.Visibility = Visibility.Collapsed;
+                PasswordBox.Visibility = Visibility.Collapsed;
                 PasswordBox.Visibility = Visibility.Visible;
                 TogglePasswordButton.Content = "👁️";
             }
@@ -110,7 +137,7 @@ namespace PGI
             else
             {
                 ConfirmPasswordBox.Password = ConfirmPasswordTextBox.Text;
-                ConfirmPasswordTextBox.Visibility = Visibility.Collapsed;
+                ConfirmPasswordBox.Visibility = Visibility.Collapsed;
                 ConfirmPasswordBox.Visibility = Visibility.Visible;
                 ToggleConfirmPasswordButton.Content = "👁️";
             }
@@ -122,6 +149,14 @@ namespace PGI
             loginWindow.Show();
             this.Close();
         }
+
+        private void ShowMessage(string message, bool isSuccess)
+        {
+            Message.Text = message;
+            Message.Foreground = isSuccess 
+                ? new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981")) 
+                : new SolidColorBrush((Color)ColorConverter.ConvertFromString("#DC2626"));
+            Message.Visibility = Visibility.Visible;
+        }
     }
 }
-
