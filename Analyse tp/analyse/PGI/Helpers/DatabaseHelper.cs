@@ -10,7 +10,7 @@ namespace PGI.Helpers
     /// </summary>
     public class DatabaseHelper
     {
-        private static string connectionString = "Server=localhost;Database=NordikAdventuresERP;Uid=root;Pwd=password;";
+        private static string connectionString = "Server=localhost;Database=NordikAdventuresERP;Uid=root;Pwd=Root@2025;";
 
         /// <summary>
         /// Obtenir une nouvelle connexion MySQL
