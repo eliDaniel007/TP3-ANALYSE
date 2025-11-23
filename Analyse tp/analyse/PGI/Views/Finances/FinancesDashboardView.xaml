@@ -23,8 +23,8 @@
                 <Border Grid.Column="0" Background="#EEF2FF" CornerRadius="10" Padding="20" Margin="0,0,12,0">
                     <StackPanel>
                         <TextBlock Text="💰 Ventes (30 jours)" FontSize="12" Foreground="#64748B" Margin="0,0,0,8"/>
-                        <TextBlock Text="125 450 $" FontSize="24" FontWeight="Bold" Foreground="#003049"/>
-                        <TextBlock Text="↗ +12% vs mois dernier" FontSize="10" Foreground="#10B981" Margin="0,4,0,0"/>
+                        <TextBlock x:Name="TxtVentes30j" Text="0 $" FontSize="24" FontWeight="Bold" Foreground="#003049"/>
+                        <TextBlock x:Name="TxtVentesEvolution" Text="" FontSize="10" Foreground="#10B981" Margin="0,4,0,0"/>
                     </StackPanel>
                 </Border>
                 
@@ -32,8 +32,8 @@
                 <Border Grid.Column="1" Background="#F0FDF4" CornerRadius="10" Padding="20" Margin="0,0,12,0">
                     <StackPanel>
                         <TextBlock Text="📊 Profit Net (30 jours)" FontSize="12" Foreground="#64748B" Margin="0,0,0,8"/>
-                        <TextBlock Text="42 850 $" FontSize="24" FontWeight="Bold" Foreground="#10B981"/>
-                        <TextBlock Text="Marge nette : 34.2%" FontSize="10" Foreground="#64748B" Margin="0,4,0,0"/>
+                        <TextBlock x:Name="TxtProfit30j" Text="0 $" FontSize="24" FontWeight="Bold" Foreground="#10B981"/>
+                        <TextBlock x:Name="TxtMargeNette" Text="Marge nette : 0%" FontSize="10" Foreground="#64748B" Margin="0,4,0,0"/>
                     </StackPanel>
                 </Border>
                 
@@ -41,8 +41,8 @@
                 <Border Grid.Column="2" Background="#FEE2E2" CornerRadius="10" Padding="20" Margin="0,0,12,0">
                     <StackPanel>
                         <TextBlock Text="⚠️ Factures en retard" FontSize="12" Foreground="#64748B" Margin="0,0,0,8"/>
-                        <TextBlock Text="7" FontSize="24" FontWeight="Bold" Foreground="#DC2626"/>
-                        <TextBlock Text="Montant dû : 18 350 $" FontSize="10" Foreground="#64748B" Margin="0,4,0,0"/>
+                        <TextBlock x:Name="TxtFacturesRetard" Text="0" FontSize="24" FontWeight="Bold" Foreground="#DC2626"/>
+                        <TextBlock x:Name="TxtMontantRetard" Text="Montant dû : 0 $" FontSize="10" Foreground="#64748B" Margin="0,4,0,0"/>
                     </StackPanel>
                 </Border>
                 
@@ -50,7 +50,7 @@
                 <Border Grid.Column="3" Background="#FEF3C7" CornerRadius="10" Padding="20">
                     <StackPanel>
                         <TextBlock Text="🛒 Commandes en attente" FontSize="12" Foreground="#64748B" Margin="0,0,0,8"/>
-                        <TextBlock Text="4" FontSize="24" FontWeight="Bold" Foreground="#F59E0B"/>
+                        <TextBlock x:Name="TxtCommandesAttente" Text="0" FontSize="24" FontWeight="Bold" Foreground="#F59E0B"/>
                         <TextBlock Text="À réceptionner" FontSize="10" Foreground="#64748B" Margin="0,4,0,0"/>
                     </StackPanel>
                 </Border>
@@ -80,7 +80,8 @@
                         </StackPanel>
                         
                         <!-- Tableau des factures impayées -->
-                        <DataGrid AutoGenerateColumns="False" 
+                        <DataGrid x:Name="UnpaidInvoicesDataGrid"
+                                AutoGenerateColumns="False" 
                                 RowHeight="40"
                                 HeadersVisibility="Column"
                                 GridLinesVisibility="None"

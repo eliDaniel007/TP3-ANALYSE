@@ -1,7 +1,11 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using PGI.Services;
+using PGI.Models;
 
 namespace PGI.Views.Finances
 {
@@ -12,23 +16,80 @@ namespace PGI.Views.Finances
         public SalesListView()
         {
             InitializeComponent();
-            LoadSampleData();
+            LoadFactures();
         }
 
-        private void LoadSampleData()
+        public void LoadFactures()
         {
-            // Données d'exemple
-            allSales = new List<Sale>
+            try
             {
-                new Sale { NumeroFacture = "F2025-1045", Date = "2025-01-28", Client = "Aventure Nordique Inc.", MontantTotal = "4 250 $", Statut = "Payée", StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981")) },
-                new Sale { NumeroFacture = "F2025-1044", Date = "2025-01-27", Client = "Plein Air Québec", MontantTotal = "3 890 $", Statut = "Partielle", StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F59E0B")) },
-                new Sale { NumeroFacture = "F2025-1043", Date = "2025-01-26", Client = "Sports Extrêmes", MontantTotal = "6 120 $", Statut = "En retard", StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#DC2626")) },
-                new Sale { NumeroFacture = "F2025-1042", Date = "2025-01-25", Client = "Équipement Pro", MontantTotal = "2 450 $", Statut = "Payée", StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981")) },
-                new Sale { NumeroFacture = "F2025-1041", Date = "2025-01-24", Client = "Randonnée Plus", MontantTotal = "5 680 $", Statut = "Payée", StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981")) },
-                new Sale { NumeroFacture = "F2025-1040", Date = "2025-01-23", Client = "Nature & Aventure", MontantTotal = "1 890 $", Statut = "Annulée", StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#6B7280")) },
-            };
+                // Charger les vraies factures depuis la base de données
+                var factures = FactureService.GetAllFactures();
+                
+                allSales = factures.Select(f => new Sale
+                {
+                    Id = f.Id,
+                    NumeroFacture = f.NumeroFacture,
+                    Date = f.DateFacture.ToString("yyyy-MM-dd"),
+                    Client = f.NomClient,
+                    MontantTotal = $"{f.MontantTotal:N2} $",
+                    Statut = GetStatutAffichage(f),
+                    StatutColor = GetStatutColor(f),
+                    FactureObject = f // Garder la référence complète
+                }).ToList();
 
-            SalesDataGrid.ItemsSource = allSales;
+                SalesDataGrid.ItemsSource = allSales;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Erreur lors du chargement des factures:\n{ex.Message}",
+                    "Erreur",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
+                
+                // Fallback sur données vides
+                allSales = new List<Sale>();
+                SalesDataGrid.ItemsSource = allSales;
+            }
+        }
+
+        private string GetStatutAffichage(Facture facture)
+        {
+            if (facture.Statut == "Annulée")
+                return "Annulée";
+            
+            if (facture.StatutPaiement == "Payée")
+                return "Payée";
+            
+            if (facture.StatutPaiement == "Partielle")
+                return "Partielle";
+            
+            // Vérifier si en retard
+            if (facture.DateEcheance < DateTime.Now && facture.StatutPaiement == "Impayée")
+                return "En retard";
+            
+            return "Impayée";
+        }
+
+        private Brush GetStatutColor(Facture facture)
+        {
+            if (facture.Statut == "Annulée")
+                return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#6B7280"));
+            
+            if (facture.StatutPaiement == "Payée")
+                return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981"));
+            
+            if (facture.StatutPaiement == "Partielle")
+                return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F59E0B"));
+            
+            // En retard
+            if (facture.DateEcheance < DateTime.Now && facture.StatutPaiement == "Impayée")
+                return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#DC2626"));
+            
+            // Impayée mais pas encore en retard
+            return new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3B82F6"));
         }
 
         private void TxtSearch_GotFocus(object sender, RoutedEventArgs e)
@@ -51,13 +112,22 @@ namespace PGI.Views.Finances
 
         private void CmbStatusFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            // TODO: Implémenter le filtrage par statut
-            MessageBox.Show(
-                "Filtrage par statut à implémenter avec la base de données.",
-                "Information",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information
-            );
+            if (allSales == null) return;
+            
+            var selectedItem = CmbStatusFilter.SelectedItem as ComboBoxItem;
+            if (selectedItem == null) return;
+            
+            string filter = selectedItem.Content.ToString() ?? "";
+            
+            if (filter == "Tous les statuts")
+            {
+                SalesDataGrid.ItemsSource = allSales;
+            }
+            else
+            {
+                var filtered = allSales.Where(s => s.Statut == filter).ToList();
+                SalesDataGrid.ItemsSource = filtered;
+            }
         }
 
         private void BtnAddSale_Click(object sender, RoutedEventArgs e)
@@ -99,17 +169,45 @@ namespace PGI.Views.Finances
             
             if (sale != null)
             {
-                // Extraire les montants (simulation)
-                double montantTotal = 4250.00;
-                double montantDu = 4250.00;
-                
-                var paymentWindow = new PaymentWindow(sale.NumeroFacture, sale.Client, montantTotal, montantDu);
-                if (paymentWindow.ShowDialog() == true)
+                if (sale.Statut == "Annulée")
                 {
-                    // Mettre à jour le statut
-                    sale.Statut = "Payée";
-                    sale.StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981"));
-                    SalesDataGrid.Items.Refresh();
+                    MessageBox.Show(
+                        "Impossible d'enregistrer un paiement pour une facture annulée.",
+                        "Attention",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning
+                    );
+                    return;
+                }
+
+                if (sale.Statut == "Payée")
+                {
+                    MessageBox.Show(
+                        "Cette facture est déjà entièrement payée.",
+                        "Information",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information
+                    );
+                    return;
+                }
+
+                // Récupérer la facture complète
+                var facture = sale.FactureObject;
+                if (facture != null)
+                {
+                    var paymentWindow = new PaymentWindow(
+                        sale.Id,
+                        sale.NumeroFacture, 
+                        sale.Client, 
+                        (double)facture.MontantTotal, 
+                        (double)facture.MontantDu
+                    );
+                    
+                    if (paymentWindow.ShowDialog() == true)
+                    {
+                        // Recharger la liste pour afficher les nouveaux statuts
+                        LoadFactures();
+                    }
                 }
             }
         }
@@ -156,11 +254,24 @@ namespace PGI.Views.Finances
             
             if (sale != null)
             {
+                // Vérifier que ce n'est pas déjà annulée
+                if (sale.Statut == "Annulée")
+                {
+                    MessageBox.Show(
+                        "Cette facture est déjà annulée.",
+                        "Information",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information
+                    );
+                    return;
+                }
+
                 var result = MessageBox.Show(
                     $"⚠️ Voulez-vous vraiment annuler cette facture ?\n\n" +
                     $"N° : {sale.NumeroFacture}\n" +
                     $"Client : {sale.Client}\n" +
                     $"Montant : {sale.MontantTotal}\n\n" +
+                    $"Les produits seront remis en stock.\n" +
                     $"Cette action est irréversible !",
                     "Confirmer l'annulation",
                     MessageBoxButton.YesNo,
@@ -169,17 +280,52 @@ namespace PGI.Views.Finances
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    // TODO: Annuler dans la base de données
-                    sale.Statut = "Annulée";
-                    sale.StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#6B7280"));
-                    SalesDataGrid.Items.Refresh();
+                    try
+                    {
+                        // Demander le motif d'annulation
+                        string motif = Microsoft.VisualBasic.Interaction.InputBox(
+                            "Veuillez entrer le motif de l'annulation:",
+                            "Motif d'annulation",
+                            "Annulation demandée par le client"
+                        );
 
-                    MessageBox.Show(
-                        $"✅ La facture '{sale.NumeroFacture}' a été annulée.",
-                        "Annulation réussie",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Information
-                    );
+                        if (string.IsNullOrWhiteSpace(motif))
+                        {
+                            MessageBox.Show(
+                                "Le motif d'annulation est obligatoire.",
+                                "Validation",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Warning
+                            );
+                            return;
+                        }
+
+                        // Annuler dans la base de données
+                        bool success = FactureService.AnnulerFacture(sale.Id, motif);
+
+                        if (success)
+                        {
+                            MessageBox.Show(
+                                $"✅ La facture '{sale.NumeroFacture}' a été annulée.\n\n" +
+                                $"Les produits ont été remis en stock.",
+                                "Annulation réussie",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Information
+                            );
+
+                            // Recharger la liste
+                            LoadFactures();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(
+                            $"Erreur lors de l'annulation:\n{ex.Message}",
+                            "Erreur",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Error
+                        );
+                    }
                 }
             }
         }
@@ -195,15 +341,17 @@ namespace PGI.Views.Finances
         }
     }
 
-    // Classe modèle pour les ventes
+    // Classe modèle pour les ventes (affichage)
     public class Sale
     {
+        public int Id { get; set; }
         public string NumeroFacture { get; set; } = string.Empty;
         public string Date { get; set; } = string.Empty;
         public string Client { get; set; } = string.Empty;
         public string MontantTotal { get; set; } = string.Empty;
         public string Statut { get; set; } = string.Empty;
         public Brush StatutColor { get; set; } = Brushes.Gray;
+        public Facture? FactureObject { get; set; } // Référence complète
     }
 }
 

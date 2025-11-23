@@ -1,0 +1,274 @@
+<Window x:Class="PGI.Views.CRM.ClientDetailsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Détails du client"
+        Height="700"
+        Width="950"
+        WindowStartupLocation="CenterOwner"
+        Background="#F8FAFC">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="25">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- En-tête -->
+            <Grid Grid.Row="0" Margin="0,0,0,20">
+                <StackPanel>
+                    <TextBlock x:Name="TxtNomClient" 
+                               Text="Client" 
+                               FontSize="24" 
+                               FontWeight="SemiBold" 
+                               Foreground="#003049"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                        <Border x:Name="BorderStatut" 
+                                Background="#10B981" 
+                                CornerRadius="6" 
+                                Padding="10,5">
+                            <TextBlock x:Name="TxtStatut" 
+                                       Text="ACTIF" 
+                                       FontSize="12" 
+                                       FontWeight="SemiBold" 
+                                       Foreground="White"/>
+                        </Border>
+                        <Border Background="#EEF2FF" CornerRadius="6" Padding="10,5" Margin="10,0,0,0">
+                            <TextBlock x:Name="TxtType" Text="Particulier" FontSize="12" Foreground="#003049"/>
+                        </Border>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+
+            <!-- KPIs du client -->
+            <Grid Grid.Row="1" Margin="0,0,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Background="White" CornerRadius="10" Padding="15" Margin="0,0,10,0">
+                    <StackPanel>
+                        <TextBlock Text="💰 Chiffre d'affaires" FontSize="11" Foreground="#64748B" Margin="0,0,0,5"/>
+                        <TextBlock x:Name="TxtCA" Text="0 $" FontSize="20" FontWeight="Bold" Foreground="#003049"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Background="White" CornerRadius="10" Padding="15" Margin="0,0,10,0">
+                    <StackPanel>
+                        <TextBlock Text="📦 Commandes" FontSize="11" Foreground="#64748B" Margin="0,0,0,5"/>
+                        <TextBlock x:Name="TxtNbCommandes" Text="0" FontSize="20" FontWeight="Bold" Foreground="#003049"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="2" Background="White" CornerRadius="10" Padding="15" Margin="0,0,10,0">
+                    <StackPanel>
+                        <TextBlock Text="🛒 Panier moyen" FontSize="11" Foreground="#64748B" Margin="0,0,0,5"/>
+                        <TextBlock x:Name="TxtPanierMoyen" Text="0 $" FontSize="20" FontWeight="Bold" Foreground="#003049"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="3" Background="White" CornerRadius="10" Padding="15">
+                    <StackPanel>
+                        <TextBlock Text="⭐ Score" FontSize="11" Foreground="#64748B" Margin="0,0,0,5"/>
+                        <TextBlock x:Name="TxtScore" Text="0" FontSize="20" FontWeight="Bold" Foreground="#F59E0B"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Informations de contact -->
+            <Border Grid.Row="2" Background="White" CornerRadius="10" Padding="20" Margin="0,0,0,15">
+                <StackPanel>
+                    <TextBlock Text="📋 Informations de contact" FontSize="16" FontWeight="SemiBold" Foreground="#003049" Margin="0,0,0,15"/>
+                    
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="Email :" Foreground="#64748B" Margin="0,5"/>
+                        <TextBlock x:Name="TxtEmail" Grid.Row="0" Grid.Column="1" Text="-" FontWeight="SemiBold" Margin="0,5"/>
+
+                        <TextBlock Grid.Row="1" Text="Téléphone :" Foreground="#64748B" Margin="0,5"/>
+                        <TextBlock x:Name="TxtTelephone" Grid.Row="1" Grid.Column="1" Text="-" Margin="0,5"/>
+
+                        <TextBlock Grid.Row="2" Text="Date création :" Foreground="#64748B" Margin="0,5"/>
+                        <TextBlock x:Name="TxtDateCreation" Grid.Row="2" Grid.Column="1" Text="-" Margin="0,5"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Tabs pour historique -->
+            <TabControl Grid.Row="4" Background="White" BorderThickness="0">
+                <TabItem Header="📜 Historique des commandes">
+                    <Border Padding="15">
+                        <DataGrid x:Name="CommandesDataGrid" 
+                                  AutoGenerateColumns="False" 
+                                  RowHeight="45"
+                                  HeadersVisibility="Column"
+                                  GridLinesVisibility="Horizontal"
+                                  Background="Transparent"
+                                  BorderThickness="0"
+                                  CanUserAddRows="False"
+                                  IsReadOnly="True"
+                                  FontSize="13">
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="Background" Value="#F8FAFC"/>
+                                    <Setter Property="Foreground" Value="#64748B"/>
+                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                    <Setter Property="FontSize" Value="12"/>
+                                    <Setter Property="Padding" Value="10,8"/>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Date" Binding="{Binding Date}" Width="120"/>
+                                <DataGridTextColumn Header="N° Facture" Binding="{Binding NumeroFacture}" Width="150"/>
+                                <DataGridTextColumn Header="Montant" Binding="{Binding MontantFormate}" Width="120"/>
+                                <DataGridTextColumn Header="Statut" Binding="{Binding Statut}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                </TabItem>
+
+                <TabItem Header="💬 Interactions">
+                    <Border Padding="15">
+                        <DataGrid x:Name="InteractionsDataGrid" 
+                                  AutoGenerateColumns="False" 
+                                  RowHeight="45"
+                                  HeadersVisibility="Column"
+                                  GridLinesVisibility="Horizontal"
+                                  Background="Transparent"
+                                  BorderThickness="0"
+                                  CanUserAddRows="False"
+                                  IsReadOnly="True"
+                                  FontSize="13">
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="Background" Value="#F8FAFC"/>
+                                    <Setter Property="Foreground" Value="#64748B"/>
+                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                    <Setter Property="FontSize" Value="12"/>
+                                    <Setter Property="Padding" Value="10,8"/>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Date" Binding="{Binding DateFormate}" Width="120"/>
+                                <DataGridTextColumn Header="Type" Binding="{Binding TypeInteraction}" Width="100"/>
+                                <DataGridTextColumn Header="Sujet" Binding="{Binding Sujet}" Width="200"/>
+                                <DataGridTextColumn Header="Employé" Binding="{Binding NomEmploye}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                </TabItem>
+
+                <TabItem Header="⭐ Évaluations">
+                    <Border Padding="15">
+                        <DataGrid x:Name="EvaluationsDataGrid" 
+                                  AutoGenerateColumns="False" 
+                                  RowHeight="45"
+                                  HeadersVisibility="Column"
+                                  GridLinesVisibility="Horizontal"
+                                  Background="Transparent"
+                                  BorderThickness="0"
+                                  CanUserAddRows="False"
+                                  IsReadOnly="True"
+                                  FontSize="13">
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="Background" Value="#F8FAFC"/>
+                                    <Setter Property="Foreground" Value="#64748B"/>
+                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                    <Setter Property="FontSize" Value="12"/>
+                                    <Setter Property="Padding" Value="10,8"/>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Date" Binding="{Binding DateFormate}" Width="120"/>
+                                <DataGridTextColumn Header="Note" Binding="{Binding NoteFormate}" Width="100"/>
+                                <DataGridTextColumn Header="Facture" Binding="{Binding NumeroFacture}" Width="150"/>
+                                <DataGridTextColumn Header="Commentaire" Binding="{Binding Commentaire}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                </TabItem>
+
+                <TabItem Header="⚠️ Alertes">
+                    <Border Padding="15">
+                        <DataGrid x:Name="AlertesDataGrid" 
+                                  AutoGenerateColumns="False" 
+                                  RowHeight="45"
+                                  HeadersVisibility="Column"
+                                  GridLinesVisibility="Horizontal"
+                                  Background="Transparent"
+                                  BorderThickness="0"
+                                  CanUserAddRows="False"
+                                  IsReadOnly="True"
+                                  FontSize="13">
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="Background" Value="#F8FAFC"/>
+                                    <Setter Property="Foreground" Value="#64748B"/>
+                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                    <Setter Property="FontSize" Value="12"/>
+                                    <Setter Property="Padding" Value="10,8"/>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Date" Binding="{Binding DateFormate}" Width="120"/>
+                                <DataGridTextColumn Header="Type" Binding="{Binding TypeAlerte}" Width="150"/>
+                                <DataGridTextColumn Header="Priorité" Binding="{Binding Priorite}" Width="100"/>
+                                <DataGridTextColumn Header="Statut" Binding="{Binding Statut}" Width="100"/>
+                                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                </TabItem>
+            </TabControl>
+
+            <!-- Bouton Fermer -->
+            <Button Grid.Row="5" 
+                    Content="Fermer" 
+                    Background="#E2E8F0" 
+                    Foreground="#64748B"
+                    BorderThickness="0"
+                    Padding="25,12"
+                    FontSize="14"
+                    Cursor="Hand"
+                    HorizontalAlignment="Right"
+                    Margin="0,20,0,0"
+                    Click="BtnClose_Click">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#CBD5E1"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </Grid>
+    </ScrollViewer>
+</Window>
+

@@ -1,19 +1,37 @@
+using System;
 using System.Windows;
+using PGI.Services;
 
 namespace PGI.Views.Finances
 {
     public partial class TaxSettingsWindow : Window
     {
-        public static double TPSRate { get; set; } = 5.0;
-        public static double TVQRate { get; set; } = 9.975;
-
         public TaxSettingsWindow()
         {
             InitializeComponent();
-            
-            // Charger les valeurs actuelles
-            TxtTPS.Text = TPSRate.ToString("0.000");
-            TxtTVQ.Text = TVQRate.ToString("0.000");
+            LoadTaxesFromDatabase();
+        }
+
+        private void LoadTaxesFromDatabase()
+        {
+            try
+            {
+                var taxes = TaxesService.GetTaxes();
+                TxtTPS.Text = (taxes.TauxTPS * 100).ToString("0.000");
+                TxtTVQ.Text = (taxes.TauxTVQ * 100).ToString("0.000");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Erreur lors du chargement des taux de taxes:\n{ex.Message}",
+                    "Erreur",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
+                // Valeurs par défaut en cas d'erreur
+                TxtTPS.Text = "5.000";
+                TxtTVQ.Text = "9.975";
+            }
         }
 
         private void BtnSave_Click(object sender, RoutedEventArgs e)
@@ -41,24 +59,34 @@ namespace PGI.Views.Finances
                 return;
             }
 
-            // Sauvegarder les nouveaux taux
-            TPSRate = tpsValue;
-            TVQRate = tvqValue;
+            try
+            {
+                // Sauvegarder dans la base de données (convertir % en décimal)
+                TaxesService.UpdateTaxRate("TPS", (decimal)tpsValue / 100m);
+                TaxesService.UpdateTaxRate("TVQ", (decimal)tvqValue / 100m);
 
-            // TODO: Enregistrer dans la base de données
+                MessageBox.Show(
+                    $"✅ Paramètres fiscaux mis à jour !\n\n" +
+                    $"TPS : {tpsValue}%\n" +
+                    $"TVQ : {tvqValue}%\n\n" +
+                    $"Ces taux seront appliqués aux prochaines factures.",
+                    "Succès",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information
+                );
 
-            MessageBox.Show(
-                $"✅ Paramètres fiscaux mis à jour !\n\n" +
-                $"TPS : {TPSRate}%\n" +
-                $"TVQ : {TVQRate}%\n\n" +
-                $"Ces taux seront appliqués aux prochaines factures.",
-                "Succès",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information
-            );
-
-            this.DialogResult = true;
-            this.Close();
+                this.DialogResult = true;
+                this.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Erreur lors de la sauvegarde des taux de taxes:\n{ex.Message}",
+                    "Erreur",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
+            }
         }
 
         private void BtnCancel_Click(object sender, RoutedEventArgs e)

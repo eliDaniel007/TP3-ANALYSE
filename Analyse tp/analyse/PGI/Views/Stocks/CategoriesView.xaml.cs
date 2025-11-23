@@ -18,7 +18,7 @@ namespace PGI.Views.Stocks
             LoadCategories();
         }
 
-        private void LoadCategories()
+        public void LoadCategories()
         {
             try
             {
