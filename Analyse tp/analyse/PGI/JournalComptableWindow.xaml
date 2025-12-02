@@ -1,0 +1,51 @@
+<Window x:Class="PGI.JournalComptableWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Journal comptable complet" Height="600" Width="1100"
+        Background="#F8FAFC">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+            <TextBlock Text="Journal comptable - Toutes les transactions" 
+                       FontWeight="Bold" FontSize="16" Foreground="#1E3A8A" VerticalAlignment="Center"/>
+            <Button Content="Filtrer par période" Margin="20,0,0,0" Padding="10,5" Background="#1E40AF" Foreground="White"/>
+            <Button Content="Exporter CSV" Margin="10,0,0,0" Padding="10,5" Background="#1E40AF" Foreground="White"/>
+        </StackPanel>
+        <DataGrid Grid.Row="1" AutoGenerateColumns="False"
+                  Background="#FFFFFF" BorderBrush="#93C5FD"
+                  GridLinesVisibility="All" HeadersVisibility="Column"
+                  RowBackground="#F8FAFC" AlternatingRowBackground="#FFFFFF">
+            <DataGrid.ColumnHeaderStyle>
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="Background" Value="#3B82F6"/>
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                    <Setter Property="Padding" Value="8,6"/>
+                </Style>
+            </DataGrid.ColumnHeaderStyle>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Date" Width="120"/>
+                <DataGridTextColumn Header="Type" Width="120"/>
+                <DataGridTextColumn Header="Description" Width="300"/>
+                <DataGridTextColumn Header="Débit" Width="120"/>
+                <DataGridTextColumn Header="Crédit" Width="120"/>
+                <DataGridTextColumn Header="Solde" Width="120"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Border Grid.Row="2" Background="#DBEAFE" Padding="12" Margin="0,12,0,0" CornerRadius="4">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Total Débit: " FontWeight="Bold" Foreground="#1E3A8A" Margin="0,0,8,0"/>
+                <TextBlock Text="$ 450 000" FontWeight="Bold" Foreground="#1E3A8A" Margin="0,0,40,0"/>
+                <TextBlock Text="Total Crédit: " FontWeight="Bold" Foreground="#1E3A8A" Margin="0,0,8,0"/>
+                <TextBlock Text="$ 450 000" FontWeight="Bold" Foreground="#1E3A8A" Margin="0,0,40,0"/>
+                <TextBlock Text="Solde: " FontWeight="Bold" Foreground="#1E3A8A" Margin="0,0,8,0"/>
+                <TextBlock Text="$ 0" FontWeight="Bold" Foreground="#10B981"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
+

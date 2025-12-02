@@ -1,359 +1,158 @@
-# 🏔️ NordikAdventures ERP
+# 🏔️ Nordik Adventures ERP
 
-> Système de gestion intégré (ERP) complet pour NordikAdventures - Spécialiste en équipement de plein air
-
-![Version](https://img.shields.io/badge/version-2.0-blue)
-![.NET](https://img.shields.io/badge/.NET-8.0-purple)
-![MySQL](https://img.shields.io/badge/MySQL-8.0+-orange)
-![WPF](https://img.shields.io/badge/WPF-Windows-blue)
-![Status](https://img.shields.io/badge/status-Production%20Ready-green)
+**Système de Gestion Intégrée (PGI/ERP) pour Nordik Adventures**  
+Application WPF .NET 8.0 avec base de données MySQL
 
 ---
 
-## 📋 Table des matières
+## ✅ Ce qui est fait
 
-- [À propos](#à-propos)
-- [Fonctionnalités](#fonctionnalités)
-- [Technologies](#technologies)
-- [Installation rapide](#installation-rapide)
-- [Modules](#modules)
-- [Documentation](#documentation)
-- [Architecture](#architecture)
-- [Captures d'écran](#captures-décran)
-- [Contribution](#contribution)
+### 📦 Module Produits et Stocks
+- ✅ Gestion complète des produits (CRUD)
+- ✅ Gestion des catégories
+- ✅ Gestion des fournisseurs
+- ✅ Historique des mouvements de stock
+- ✅ Tableau de bord avec statistiques
+- ✅ Recherche et filtrage des produits
 
----
-
-## 🎯 À propos
-
-**NordikAdventures ERP** est un système de gestion d'entreprise complet développé en C# WPF avec MySQL, conçu spécifiquement pour une entreprise de vente d'équipement de plein air.
-
-### ✨ Points forts
-
-- 🔄 **Gestion complète des stocks** avec suivi des mouvements
-- 💰 **Module financier** avec facturation automatisée
-- 👥 **CRM avancé** avec scoring et automatisations
-- 📊 **Tableaux de bord** avec KPIs en temps réel
-- 🔒 **Authentification** multi-rôles (Admin, Employé, Client)
-- ⚡ **Automatisations** via triggers SQL
-- 🎨 **Interface moderne** en WPF avec design épuré
-
----
-
-## 🚀 Fonctionnalités
-
-### Module Stocks & Inventaire
-- ✅ Gestion des produits, catégories et fournisseurs
-- ✅ Suivi des niveaux de stock en temps réel
-- ✅ Historique complet des mouvements (entrées/sorties)
-- ✅ Alertes automatiques de réapprovisionnement
-- ✅ Calcul automatique des marges bénéficiaires
-
-### Module Finances & Facturation
-- ✅ Création de factures avec taxes (TPS/TVQ)
-- ✅ Gestion des paiements multiples
-- ✅ Commandes fournisseurs avec réception
-- ✅ Mise à jour automatique du stock
-- ✅ Journal comptable automatisé
-- ✅ Rapports financiers (ventes, profits, top produits)
-
-### Module CRM (Gestion Clients)
-- ✅ Fiche client complète avec historique
-- ✅ **Scoring automatique** des clients
-- ✅ **Changement automatique de statut** (Prospect → Actif → Fidèle)
-- ✅ Évaluations de satisfaction (1-5 étoiles)
-- ✅ **Alertes automatiques** si satisfaction faible
-- ✅ Campagnes marketing avec suivi
-- ✅ Statistiques et KPIs par client
-- ✅ Interactions traçables
-
-### Automatisations CRM 🤖
-- **Prospect → Actif** après 1ère commande
-- **Actif → Fidèle** après >5 commandes ou >3000$ CA
-- **Alerte automatique** si note ≤ 2/5
-- **Interaction automatique** lors de chaque vente
-- **Email de bienvenue** pour nouveaux clients
-- **Détection d'inactivité** (12 mois sans achat)
-
-### Module Dashboard
-- ✅ Vue d'ensemble des KPIs
-- ✅ Statistiques de ventes
-- ✅ État des stocks critiques
-- ✅ Alertes et notifications
-
-### Module Shopping (Client)
-- ✅ Catalogue de produits avec recherche
+### 🛒 Côté Client
+- ✅ Interface d'achat pour les clients
 - ✅ Panier d'achat
-- ✅ Historique des commandes
-- ✅ Profil client
+- ✅ Gestion des commandes
+- ✅ Images des produits intégrées
 
 ---
 
-## 🛠️ Technologies
+## ⚠️ Ce qu'il reste à faire
 
-### Backend
-- **C# .NET 8.0** - Framework principal
-- **ADO.NET** - Accès aux données direct
-- **MySQL 8.0+** - Base de données
-- **MySql.Data** - Connecteur MySQL
-
-### Frontend
-- **WPF (Windows Presentation Foundation)** - Interface graphique
-- **XAML** - Langage de balisage
-- **MVVM Pattern** - Architecture
-
-### Base de données
-- **MySQL 8.0+**
-- **Triggers** - Automatisations
-- **Stored Procedures** - Logique métier
-- **Views** - Calculs en temps réel
-- **Functions** - Validation et règles
+- [ ] Module Finances (comptabilité, factures, paiements)
+- [ ] Module CRM complet (gestion des clients, campagnes marketing)
+- [ ] Module Achats (commandes fournisseurs)
+- [ ] Module Ventes (gestion des ventes)
+- [ ] Rapports et graphiques avancés
+- [ ] Sécurisation des mots de passe (hashing)
+- [ ] Tests unitaires
 
 ---
 
-## ⚡ Installation rapide
+## 🚀 Avant de pouvoir utiliser le projet
 
-### Prérequis
-- Windows 10/11
-- .NET 8.0 SDK
-- MySQL 8.0+ (ou MariaDB 10.5+)
-- Visual Studio 2022 (recommandé) ou VS Code
+### 1️⃣ Prérequis
 
-### Étape 1 : Cloner le projet
+- **Windows** 10/11
+- **.NET SDK 8.0+** : [Télécharger](https://dotnet.microsoft.com/download)
+- **Visual Studio 2022+** : [Télécharger](https://visualstudio.microsoft.com/)
+- **MySQL Server 8.0+** : [Télécharger](https://dev.mysql.com/downloads/mysql/)
+- **MySQL Workbench 8.0+** : [Télécharger](https://dev.mysql.com/downloads/workbench/)
 
-```bash
-git clone https://github.com/votre-utilisateur/nordikadventures-erp.git
-cd nordikadventures-erp
-```
+### 2️⃣ Installation de MySQL
 
-### Étape 2 : Installer la base de données
+1. Installer MySQL Community Server
+2. Définir un mot de passe pour l'utilisateur **root** (notez-le !)
+3. Installer MySQL Workbench
 
-**Option A - Ligne de commande :**
-```bash
-mysql -u root -p < sql_scripts/SQL_COMPLET_NordikAdventuresERP.sql
-```
+### 3️⃣ Créer la Base de Données
 
-**Option B - MySQL Workbench :**
-1. Ouvrir MySQL Workbench
-2. File → Open SQL Script
-3. Sélectionner `sql_scripts/SQL_COMPLET_NordikAdventuresERP.sql`
-4. Exécuter (⚡)
+**Dans MySQL Workbench :**
 
-### Étape 3 : Configurer la connexion
+1. Se connecter au serveur local (root + votre mot de passe)
+2. Ouvrir le fichier SQL : `sql_scripts/SQL_COMPLET_UNIFIE.sql`
+3. Exécuter le script (⚡ Execute)
+4. Vérifier que la base de données `NordikAdventuresERP` a été créée
 
-Modifier `Helpers/DatabaseHelper.cs` :
+### 4️⃣ Configurer la Connexion
+
+1. Ouvrir le fichier : `Analyse tp/analyse/PGI/Helpers/DatabaseHelper.cs`
+2. Ligne 13, modifier le mot de passe MySQL :
 
 ```csharp
-private static string connectionString = 
-    "Server=localhost;Database=NordikAdventuresERP;User ID=root;Password=VOTRE_MOT_DE_PASSE;";
+private static string connectionString = "Server=localhost;Database=NordikAdventuresERP;Uid=root;Pwd=VOTRE_MOT_DE_PASSE;";
 ```
 
-### Étape 4 : Compiler et lancer
+3. Remplacer `VOTRE_MOT_DE_PASSE` par votre mot de passe MySQL root
+4. Sauvegarder le fichier
 
-```bash
-cd "Analyse tp/analyse/PGI"
-dotnet restore
-dotnet build
-dotnet run
-```
+### 5️⃣ Lancer l'Application
 
-**OU** ouvrir `Analyse tp/analyse/PGI.sln` dans Visual Studio et appuyer sur F5.
+1. Ouvrir le projet dans Visual Studio : `Analyse tp/analyse/PGI.sln`
+2. Appuyer sur **F5** (ou cliquer sur ▶️ Debug)
+3. Se connecter avec les identifiants ci-dessous
 
 ---
 
-## 📦 Modules
+## 🔑 Identifiants de Connexion
 
-| Module | Description | Statut |
-|--------|-------------|--------|
-| **Stocks** | Gestion inventaire, produits, fournisseurs | ✅ Complet |
-| **Finances** | Facturation, paiements, commandes | ✅ Complet |
-| **CRM** | Gestion clients, scoring, automatisations | ✅ Complet |
-| **Dashboard** | Tableaux de bord et KPIs | ✅ Complet |
-| **Shopping** | Interface client (catalogue, panier) | ✅ Complet |
-| **RH** | Employés et paies | 🔄 Données initiales |
+### 👨‍💼 Employé (Accès PGI)
 
----
+**Email :** `admin@nordikadventures.com`  
+**Mot de passe :** `Admin123`  
+**Rôle :** Administrateur (accès complet)
 
-## 📚 Documentation
+### 🛒 Client (Accès Site d'Achat)
 
-### Guides d'installation
-- 📄 [`sql_scripts/README_INSTALLATION.md`](sql_scripts/README_INSTALLATION.md) - Installation complète BDD
-- 📄 [`Analyse tp/analyse/PGI/GUIDE_DEMARRAGE_RAPIDE.md`](Analyse%20tp/analyse/PGI/GUIDE_DEMARRAGE_RAPIDE.md) - Démarrage rapide
-- 📄 [`CONFIGURATION_SQL_MYSQL.md`](CONFIGURATION_SQL_MYSQL.md) - Configuration MySQL
-- 📄 [`Analyse tp/analyse/PGI/README_INSTALLATION_MYSQL.md`](Analyse%20tp/analyse/PGI/README_INSTALLATION_MYSQL.md) - Installation MySQL
+**Email :** `jean.tremblay@client.com`  
+**Mot de passe :** `Client123`
 
-### Documentation modules
-- 📄 [`MODULE_CRM_DOCUMENTATION.md`](MODULE_CRM_DOCUMENTATION.md) - Documentation complète CRM
-- 📄 [`MODULE_FINANCES_DOCUMENTATION.md`](MODULE_FINANCES_DOCUMENTATION.md) - Documentation complète Finances
-- 📄 [`GUIDE_RAPIDE_FINANCES.md`](GUIDE_RAPIDE_FINANCES.md) - Guide rapide Finances
-
-### Référence technique
-- 📄 [`IDENTIFIANTS_TEST.md`](IDENTIFIANTS_TEST.md) - Comptes de test
-- 📄 [`Analyse tp/analyse/PGI/VALEURS_ENUM.md`](Analyse%20tp/analyse/PGI/VALEURS_ENUM.md) - Valeurs ENUM SQL
+**Autres clients disponibles :**
+- `marie.client@test.com` / `Client123`
+- `pierre.client@entreprise.com` / `Client123`
+- `client.sophie@gmail.com` / `Client123`
+- `contact@nordikclient.com` / `Client123`
 
 ---
 
-## 🏗️ Architecture
-
-### Structure du projet
+## 📁 Structure du Projet
 
 ```
-NordikAdventures ERP/
+TP3-ANALYSE/
 │
-├── 📁 Analyse tp/analyse/PGI/          # Application C# WPF
-│   ├── Helpers/                        # DatabaseHelper
-│   ├── Models/                         # 18 modèles de données
-│   ├── Services/                       # 16 services métier
-│   ├── Views/                          # Vues XAML
-│   │   ├── CRM/                        # Module CRM (14 fichiers)
-│   │   ├── Finances/                   # Module Finances (30 fichiers)
-│   │   ├── Stocks/                     # Module Stocks (20 fichiers)
-│   │   ├── Dashboard/                  # Tableau de bord
-│   │   ├── Shopping/                   # Interface client
-│   │   └── Settings/                   # Paramètres
-│   ├── App.xaml                        # Application principale
-│   ├── MainWindow.xaml                 # Fenêtre principale
-│   └── PGI.csproj                      # Fichier projet
+├── README.md                          # Documentation principale
+├── build_project.bat                  # Script de compilation
 │
-├── 📁 sql_scripts/                     # Scripts SQL
-│   ├── SQL_COMPLET_NordikAdventuresERP.sql  ⭐ FICHIER UNIQUE
-│   └── README_INSTALLATION.md
+├── sql_scripts/                       # Scripts SQL
+│   └── SQL_COMPLET_UNIFIE.sql        # Script complet (schéma + données)
 │
-├── 📁 docs/                            # Documentation projet
-├── 📁 assets/                          # Ressources (images, schémas)
-├── 📁 scripts/                         # Scripts utilitaires
-└── README.md                           # Ce fichier
+├── assets/                            # Ressources
+│   └── IMAGES PRODUITS/              # Images des produits
+│
+└── Analyse tp/analyse/                # Code source
+    └── PGI/
+        ├── PGI.sln                   # Solution Visual Studio
+        ├── Models/                   # Modèles de données
+        ├── Services/                  # Logique métier
+        ├── Views/                     # Interfaces utilisateur
+        │   ├── Stocks/               # Module Stocks (complet)
+        │   ├── Shopping/             # Module Client (complet)
+        │   ├── Finances/             # Module Finances (en développement)
+        │   └── CRM/                  # Module CRM (en développement)
+        └── Helpers/
+            └── DatabaseHelper.cs     # Configuration connexion MySQL
 ```
 
-### Base de données (22 tables)
+---
 
-**Module RH :** `employes`, `paies`  
-**Module Stocks :** `categories`, `fournisseurs`, `produits`, `niveaux_stock`, `mouvements_stock`  
-**Module Clients :** `clients`  
-**Module Finances :** `parametres_taxes`, `factures`, `lignes_factures`, `paiements`, `commandes_fournisseurs`, `lignes_commandes_fournisseurs`  
-**Module CRM :** `interactions_clients`, `evaluations_clients`, `campagnes_marketing`, `alertes_service_client`
+## 🛠️ Technologies Utilisées
 
-**+ 1 Vue :** `vue_statistiques_clients` (KPIs calculés)
+- **WPF** (.NET 8.0)
+- **C# 12.0**
+- **MySQL 8.0+**
+- **ADO.NET**
 
 ---
 
-## 🖼️ Captures d'écran
+## 📝 Notes Importantes
 
-### Authentification
-Connexion sécurisée avec 3 types de comptes : Admin, Employé, Client
-
-### Dashboard
-Vue d'ensemble avec KPIs en temps réel et graphiques
-
-### Module Stocks
-Gestion complète des produits, catégories, fournisseurs et mouvements
-
-### Module Finances
-Facturation, paiements, commandes fournisseurs, journal comptable
-
-### Module CRM
-Fiche client complète, scoring, interactions, alertes automatiques
-
-### Shopping Client
-Catalogue de produits avec panier et historique de commandes
+- ⚠️ **Les mots de passe ne sont PAS hashés** (développement uniquement)
+- ⚠️ **Ne PAS utiliser en production sans sécuriser les mots de passe**
+- ✅ **Le fichier SQL contient toutes les données nécessaires** (schéma + données de test)
 
 ---
 
-## 🔐 Identifiants de test
+## 👤 Auteur
 
-### Administrateur
-- **Email :** `admin@nordikadventures.com`
-- **Mot de passe :** `Admin123`
-
-### Employé
-- **Email :** `employe@nordikadventures.com`
-- **Mot de passe :** `Employe123`
-
-### Client
-- **Email :** `jean.tremblay@client.com`
-- **Mot de passe :** `Client123`
-
-📄 Voir [`IDENTIFIANTS_TEST.md`](IDENTIFIANTS_TEST.md) pour la liste complète
+**eliDaniel007**  
+GitHub : [github.com/eliDaniel007](https://github.com/eliDaniel007)
 
 ---
 
-## 🎯 Cas d'utilisation
-
-### Pour un commerce de plein air
-- Gestion de l'inventaire (vêtements, équipements, accessoires)
-- Facturation avec taxes canadiennes (TPS/TVQ)
-- Fidélisation automatique des clients
-- Suivi des commandes fournisseurs
-- Rapports financiers
-
-### Pour un projet académique
-- Démontre l'architecture 3-tiers
-- Utilisation de triggers et procédures stockées
-- Automatisations métier
-- Interface utilisateur professionnelle
-- Documentation complète
-
----
-
-## 🤝 Contribution
-
-Ce projet est un système ERP complet et fonctionnel. Les contributions sont les bienvenues !
-
-### Comment contribuer
-1. Fork le projet
-2. Créer une branche (`git checkout -b feature/AmazingFeature`)
-3. Commit les changements (`git commit -m 'Add AmazingFeature'`)
-4. Push vers la branche (`git push origin feature/AmazingFeature`)
-5. Ouvrir une Pull Request
-
----
-
-## 📄 Licence
-
-Ce projet est développé dans un cadre académique.
-
----
-
-## 👨‍💻 Auteur
-
-**Projet académique** - INF27523  
-**Institution :** [Votre institution]  
-**Date :** Janvier 2025
-
----
-
-## 🙏 Remerciements
-
-- MySQL pour la base de données robuste
-- Microsoft pour .NET et WPF
-- La communauté open source
-
----
-
-## 📞 Support
-
-Pour toute question ou problème :
-1. Consulter la [documentation](#documentation)
-2. Vérifier les [identifiants de test](IDENTIFIANTS_TEST.md)
-3. Lire le [guide d'installation](sql_scripts/README_INSTALLATION.md)
-
----
-
-## 🚀 Roadmap future (optionnel)
-
-- [ ] Export PDF des factures
-- [ ] Notifications push
-- [ ] API REST pour mobile
-- [ ] Dashboard analytique avancé
-- [ ] Gestion multi-devises
-- [ ] Intégration paiement en ligne
-
----
-
-**⭐ Si ce projet vous a été utile, n'hésitez pas à laisser une étoile !**
-
----
-
-<p align="center">
-  Made with ❤️ for NordikAdventures
-</p>
+**🚀 Bon développement avec Nordik Adventures ERP !**

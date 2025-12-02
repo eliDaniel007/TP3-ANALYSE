@@ -10,7 +10,9 @@ namespace PGI.Helpers
     /// </summary>
     public class DatabaseHelper
     {
-        private static string connectionString = "Server=localhost;Database=NordikAdventuresERP;Uid=root;Pwd=password;";
+        // Connexion MySQL simple - Mot de passe : password
+        // Les mots de passe des employés/clients sont stockés en clair dans la colonne mot_de_passe (pas de hashage)
+        private static string connectionString = "Server=localhost;Database=NordikAdventuresERP;Uid=root;Pwd=password;AllowUserVariables=true;";
 
         /// <summary>
         /// Obtenir une nouvelle connexion MySQL
@@ -21,11 +23,13 @@ namespace PGI.Helpers
         }
 
         /// <summary>
-        /// Configurer la chaîne de connexion
+        /// Configurer la chaîne de connexion (connexion simple MySQL)
         /// </summary>
         public static void SetConnectionString(string server, string database, string uid, string pwd)
         {
-            connectionString = $"Server={server};Database={database};Uid={uid};Pwd={pwd};";
+            // Connexion simple à MySQL
+            // Les mots de passe des employés/clients sont en clair dans la colonne mot_de_passe (pas de hashage)
+            connectionString = $"Server={server};Database={database};Uid={uid};Pwd={pwd};AllowUserVariables=true;";
         }
 
         /// <summary>

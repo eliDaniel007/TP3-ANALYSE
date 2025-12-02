@@ -146,14 +146,6 @@ namespace PGI.Services
         }
 
         /// <summary>
-        /// Vérifier si un email contient "client"
-        /// </summary>
-        public static bool IsClientEmail(string email)
-        {
-            return email.ToLower().Contains("client");
-        }
-
-        /// <summary>
         /// Obtenir un client par son ID
         /// </summary>
         public static Client? GetClientById(int id)
@@ -161,7 +153,7 @@ namespace PGI.Services
             try
             {
                 string query = @"
-                    SELECT id, type, nom, courriel_contact, mot_de_passe, telephone, statut, date_creation
+                    SELECT id, type, nom, courriel_contact, telephone, statut, date_creation
                     FROM clients
                     WHERE id = @id";
 
@@ -181,7 +173,6 @@ namespace PGI.Services
                         Type = row["type"].ToString() ?? string.Empty,
                         Nom = row["nom"].ToString() ?? string.Empty,
                         CourrielContact = row["courriel_contact"].ToString() ?? string.Empty,
-                        MotDePasse = row["mot_de_passe"] != DBNull.Value ? row["mot_de_passe"].ToString() : string.Empty,
                         Telephone = row["telephone"] != DBNull.Value ? row["telephone"].ToString() : null,
                         Statut = row["statut"].ToString() ?? "Actif",
                         DateCreation = Convert.ToDateTime(row["date_creation"])
@@ -197,257 +188,11 @@ namespace PGI.Services
         }
 
         /// <summary>
-        /// Obtenir tous les clients
+        /// Vérifier si un email contient "client"
         /// </summary>
-        public static List<Client> GetAllClients()
+        public static bool IsClientEmail(string email)
         {
-            var clients = new List<Client>();
-
-            try
-            {
-                string query = @"
-                    SELECT id, type, nom, courriel_contact, mot_de_passe, telephone, statut, date_creation
-                    FROM clients
-                    ORDER BY nom";
-
-                var dt = DatabaseHelper.ExecuteQuery(query, null);
-
-                foreach (DataRow row in dt.Rows)
-                {
-                    clients.Add(new Client
-                    {
-                        Id = Convert.ToInt32(row["id"]),
-                        Type = row["type"].ToString() ?? string.Empty,
-                        Nom = row["nom"].ToString() ?? string.Empty,
-                        CourrielContact = row["courriel_contact"].ToString() ?? string.Empty,
-                        MotDePasse = row["mot_de_passe"] != DBNull.Value ? row["mot_de_passe"].ToString() : string.Empty,
-                        Telephone = row["telephone"] != DBNull.Value ? row["telephone"].ToString() : null,
-                        Statut = row["statut"].ToString() ?? "Actif",
-                        DateCreation = Convert.ToDateTime(row["date_creation"])
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Erreur lors de la récupération des clients : {ex.Message}", ex);
-            }
-
-            return clients;
-        }
-
-        /// <summary>
-        /// Créer un nouveau client (mode CRM avec validation complète)
-        /// </summary>
-        public static int CreerClient(Client client)
-        {
-            // Validation des champs obligatoires
-            if (string.IsNullOrWhiteSpace(client.Nom))
-                throw new Exception("Le nom du client est obligatoire.");
-            
-            if (string.IsNullOrWhiteSpace(client.CourrielContact))
-                throw new Exception("L'adresse email est obligatoire.");
-            
-            if (!client.CourrielContact.Contains("@"))
-                throw new Exception("L'adresse email n'est pas valide.");
-            
-            if (string.IsNullOrWhiteSpace(client.Telephone))
-                throw new Exception("Le téléphone est obligatoire.");
-            
-            if (string.IsNullOrWhiteSpace(client.Type))
-                throw new Exception("Le type de client est obligatoire.");
-
-            // Vérifier l'unicité de l'email
-            var existingClient = GetClientByEmail(client.CourrielContact);
-            if (existingClient != null)
-            {
-                throw new Exception("Un client avec cette adresse email existe déjà.");
-            }
-
-            try
-            {
-                string query = @"
-                    INSERT INTO clients (type, nom, courriel_contact, telephone, mot_de_passe, statut)
-                    VALUES (@type, @nom, @email, @telephone, @password, @statut)";
-
-                var parameters = new Dictionary<string, object>
-                {
-                    { "@type", client.Type },
-                    { "@nom", client.Nom },
-                    { "@email", client.CourrielContact },
-                    { "@telephone", client.Telephone ?? string.Empty },
-                    { "@password", client.MotDePasse ?? string.Empty },
-                    { "@statut", string.IsNullOrWhiteSpace(client.Statut) ? "Prospect" : client.Statut }
-                };
-
-                DatabaseHelper.ExecuteNonQuery(query, parameters);
-                int newId = (int)DatabaseHelper.GetLastInsertId();
-                
-                // Créer une interaction de bienvenue
-                InteractionClientService.CreerInteraction(new Models.InteractionClient
-                {
-                    ClientId = newId,
-                    TypeInteraction = "Email",
-                    Sujet = "Bienvenue",
-                    Description = $"Bienvenue chez NordikAdventures! Nous sommes ravis de vous compter parmi nos clients.",
-                    DateInteraction = DateTime.Now
-                });
-                
-                return newId;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Erreur lors de la création du client: {ex.Message}", ex);
-            }
-        }
-
-        /// <summary>
-        /// Mettre à jour un client
-        /// </summary>
-        public static bool UpdateClient(Client client)
-        {
-            // Validation
-            if (client.Id <= 0)
-                throw new Exception("ID client invalide.");
-            
-            if (string.IsNullOrWhiteSpace(client.Nom))
-                throw new Exception("Le nom du client est obligatoire.");
-            
-            if (string.IsNullOrWhiteSpace(client.CourrielContact))
-                throw new Exception("L'adresse email est obligatoire.");
-            
-            if (string.IsNullOrWhiteSpace(client.Telephone))
-                throw new Exception("Le téléphone est obligatoire.");
-
-            try
-            {
-                string query = @"
-                    UPDATE clients SET
-                        type = @type,
-                        nom = @nom,
-                        courriel_contact = @email,
-                        telephone = @telephone,
-                        statut = @statut
-                    WHERE id = @id";
-
-                var parameters = new Dictionary<string, object>
-                {
-                    { "@id", client.Id },
-                    { "@type", client.Type },
-                    { "@nom", client.Nom },
-                    { "@email", client.CourrielContact },
-                    { "@telephone", client.Telephone ?? string.Empty },
-                    { "@statut", client.Statut }
-                };
-
-                return DatabaseHelper.ExecuteNonQuery(query, parameters) > 0;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Erreur lors de la mise à jour du client: {ex.Message}", ex);
-            }
-        }
-
-        /// <summary>
-        /// Changer le statut d'un client (avec création d'interaction)
-        /// </summary>
-        public static bool ChangerStatut(int clientId, string nouveauStatut)
-        {
-            // Validation du statut
-            var statutsValides = new[] { "Prospect", "Actif", "Fidèle", "Inactif" };
-            if (!Array.Exists(statutsValides, s => s == nouveauStatut))
-            {
-                throw new Exception($"Statut invalide. Doit être: {string.Join(", ", statutsValides)}");
-            }
-
-            try
-            {
-                var client = GetClientById(clientId);
-                if (client == null)
-                    throw new Exception("Client introuvable.");
-
-                string ancienStatut = client.Statut;
-                
-                // Mettre à jour le statut
-                string query = "UPDATE clients SET statut = @statut WHERE id = @id";
-                var parameters = new Dictionary<string, object>
-                {
-                    { "@id", clientId },
-                    { "@statut", nouveauStatut }
-                };
-
-                bool success = DatabaseHelper.ExecuteNonQuery(query, parameters) > 0;
-                
-                if (success)
-                {
-                    // Créer une interaction pour documenter le changement
-                    InteractionClientService.CreerInteraction(new Models.InteractionClient
-                    {
-                        ClientId = clientId,
-                        TypeInteraction = "Note",
-                        Sujet = $"Changement de statut: {ancienStatut} → {nouveauStatut}",
-                        Description = $"Statut du client modifié manuellement de '{ancienStatut}' à '{nouveauStatut}'.",
-                        DateInteraction = DateTime.Now
-                    });
-                }
-                
-                return success;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Erreur lors du changement de statut: {ex.Message}", ex);
-            }
-        }
-
-        /// <summary>
-        /// Désactiver un client (ne peut pas être supprimé s'il a des ventes)
-        /// </summary>
-        public static bool DesactiverClient(int clientId)
-        {
-            try
-            {
-                // Vérifier si le client a des ventes
-                string checkQuery = @"
-                    SELECT COUNT(*) FROM factures WHERE client_id = @clientId";
-                
-                var checkParams = new Dictionary<string, object>
-                {
-                    { "@clientId", clientId }
-                };
-                
-                int nbVentes = Convert.ToInt32(DatabaseHelper.ExecuteScalar(checkQuery, checkParams));
-                
-                if (nbVentes > 0)
-                {
-                    // Désactiver seulement (ne pas supprimer)
-                    return ChangerStatut(clientId, "Inactif");
-                }
-                else
-                {
-                    // Aucune vente, on peut supprimer
-                    string deleteQuery = "DELETE FROM clients WHERE id = @clientId";
-                    return DatabaseHelper.ExecuteNonQuery(deleteQuery, checkParams) > 0;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Erreur lors de la désactivation du client: {ex.Message}", ex);
-            }
-        }
-
-        /// <summary>
-        /// Marquer les clients inactifs (appel procédure stockée)
-        /// </summary>
-        public static void MarquerClientsInactifs()
-        {
-            try
-            {
-                string query = "CALL sp_marquer_clients_inactifs()";
-                DatabaseHelper.ExecuteNonQuery(query, null);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Erreur lors du marquage des clients inactifs: {ex.Message}", ex);
-            }
+            return email.ToLower().Contains("client");
         }
     }
 }

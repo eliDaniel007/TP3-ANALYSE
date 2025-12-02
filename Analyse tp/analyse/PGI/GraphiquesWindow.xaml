@@ -1,0 +1,57 @@
+<Window x:Class="PGI.GraphiquesWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Graphiques et analyses" Height="600" Width="1000"
+        Background="#F8FAFC">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <TextBlock Text="Graphiques et analyses visuelles" 
+                   FontWeight="Bold" FontSize="16" Foreground="#1E3A8A" Margin="0,0,0,12"/>
+        <UniformGrid Grid.Row="1" Columns="2" Rows="2">
+            <Border Margin="8" Background="#FFFFFF" BorderBrush="#93C5FD" BorderThickness="1" CornerRadius="6" Padding="16">
+                <StackPanel>
+                    <TextBlock Text="📈 Ventes par mois" FontWeight="Bold" FontSize="14" Foreground="#1E3A8A" Margin="0,0,0,12"/>
+                    <Border Height="200" Background="#F1F5F9" CornerRadius="4">
+                        <TextBlock Text="Graphique des ventes mensuelles&#10;(données factices)" 
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   Foreground="#64748B" TextAlignment="Center"/>
+                    </Border>
+                </StackPanel>
+            </Border>
+            <Border Margin="8" Background="#FFFFFF" BorderBrush="#93C5FD" BorderThickness="1" CornerRadius="6" Padding="16">
+                <StackPanel>
+                    <TextBlock Text="📊 Répartition par catégorie" FontWeight="Bold" FontSize="14" Foreground="#1E3A8A" Margin="0,0,0,12"/>
+                    <Border Height="200" Background="#F1F5F9" CornerRadius="4">
+                        <TextBlock Text="Graphique en secteurs&#10;(données factices)" 
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   Foreground="#64748B" TextAlignment="Center"/>
+                    </Border>
+                </StackPanel>
+            </Border>
+            <Border Margin="8" Background="#FFFFFF" BorderBrush="#93C5FD" BorderThickness="1" CornerRadius="6" Padding="16">
+                <StackPanel>
+                    <TextBlock Text="📉 Évolution du stock" FontWeight="Bold" FontSize="14" Foreground="#1E3A8A" Margin="0,0,0,12"/>
+                    <Border Height="200" Background="#F1F5F9" CornerRadius="4">
+                        <TextBlock Text="Graphique linéaire&#10;(données factices)" 
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   Foreground="#64748B" TextAlignment="Center"/>
+                    </Border>
+                </StackPanel>
+            </Border>
+            <Border Margin="8" Background="#FFFFFF" BorderBrush="#93C5FD" BorderThickness="1" CornerRadius="6" Padding="16">
+                <StackPanel>
+                    <TextBlock Text="💰 Profitabilité par produit" FontWeight="Bold" FontSize="14" Foreground="#1E3A8A" Margin="0,0,0,12"/>
+                    <Border Height="200" Background="#F1F5F9" CornerRadius="4">
+                        <TextBlock Text="Graphique en barres&#10;(données factices)" 
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   Foreground="#64748B" TextAlignment="Center"/>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+    </Grid>
+</Window>
+

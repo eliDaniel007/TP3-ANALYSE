@@ -8,7 +8,6 @@ namespace PGI.Models
         public string Type { get; set; } = "Particulier";
         public string Nom { get; set; } = string.Empty;
         public string CourrielContact { get; set; } = string.Empty;
-        public string MotDePasse { get; set; } = string.Empty; // Ajouté pour l'authentification
         public string? Telephone { get; set; }
         public string Statut { get; set; } = "Prospect";
         public DateTime DateCreation { get; set; }

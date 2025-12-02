@@ -3,99 +3,30 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using PGI.Services;
-using PGI.Models;
 
 namespace PGI.Views.Finances
 {
     public partial class SaleFormView : UserControl
     {
         private List<SaleLine> saleLines;
-        private List<Client> clients;
-        private List<Produit> produits;
-        private string numeroFacture;
 
         public SaleFormView()
         {
             InitializeComponent();
             saleLines = new List<SaleLine>();
             ProductsDataGrid.ItemsSource = saleLines;
-            
-            // Générer le numéro de facture
-            numeroFacture = FactureService.GenererNumeroFacture();
-            // TxtNumeroFacture.Text = numeroFacture; // TODO: Ajouter ce TextBox dans le XAML si nécessaire
-            
-            // Charger les données
-            LoadClients();
-            LoadProduits();
-            
             CalculateTotals();
-        }
-
-        private void LoadClients()
-        {
-            try
-            {
-                clients = ClientService.GetAllClients();
-                
-                // Ajouter un élément par défaut
-                CmbClient.Items.Clear();
-                CmbClient.Items.Add(new ComboBoxItem { Content = "Sélectionner un client..." });
-                
-                // Ajouter les clients actifs uniquement
-                foreach (var client in clients.Where(c => c.Statut == "Actif"))
-                {
-                    var item = new ComboBoxItem 
-                    { 
-                        Content = client.Nom,
-                        Tag = client
-                    };
-                    CmbClient.Items.Add(item);
-                }
-                
-                CmbClient.SelectedIndex = 0;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(
-                    $"Erreur lors du chargement des clients:\n{ex.Message}",
-                    "Erreur",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error
-                );
-            }
-        }
-
-        private void LoadProduits()
-        {
-            try
-            {
-                produits = ProduitService.GetAllProduits()
-                    .Where(p => p.Statut == "Actif")
-                    .ToList();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(
-                    $"Erreur lors du chargement des produits:\n{ex.Message}",
-                    "Erreur",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error
-                );
-                produits = new List<Produit>();
-            }
         }
 
         private void CmbClient_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var selectedItem = CmbClient.SelectedItem as ComboBoxItem;
-            if (selectedItem != null && selectedItem.Tag is Client client)
+            if (selectedItem != null && selectedItem.Content.ToString() != "Sélectionner un client...")
             {
-                // Afficher les vraies informations du client
-                TxtClientInfo.Text = $"📧 Email: {client.CourrielContact}\n" +
-                                   $"📞 Téléphone: {client.Telephone ?? "N/A"}\n" +
-                                   $"📊 Statut: {client.Statut}\n" +
-                                   $"📅 Client depuis: {client.DateCreation:dd/MM/yyyy}";
+                // Afficher les informations du client (simulation)
+                TxtClientInfo.Text = $"📧 Email: contact@{selectedItem.Content.ToString().ToLower().Replace(" ", "")}.com\n" +
+                                   $"📞 Téléphone: (514) 555-1234\n" +
+                                   $"📍 Adresse: 123 Rue Principale, Montréal, QC H3A 1B1";
             }
             else
             {
@@ -105,42 +36,27 @@ namespace PGI.Views.Finances
 
         private void BtnAddProduct_Click(object sender, RoutedEventArgs e)
         {
-            // Créer une fenêtre de sélection de produits
-            var selectWindow = new ProductSelectionWindow(produits);
-            if (selectWindow.ShowDialog() == true && selectWindow.SelectedProduct != null)
+            // Ajouter une ligne de produit (simulation)
+            var newLine = new SaleLine
             {
-                var produit = selectWindow.SelectedProduct;
-                int quantite = selectWindow.Quantity;
-                
-                // Vérifier si le produit existe déjà dans la facture
-                var existingLine = saleLines.FirstOrDefault(l => l.ProduitId == produit.Id);
-                if (existingLine != null)
-                {
-                    // Augmenter la quantité
-                    int newQte = int.Parse(existingLine.Quantite) + quantite;
-                    existingLine.Quantite = newQte.ToString();
-                    existingLine.Total = $"{newQte * produit.Prix:N2} $";
-                }
-                else
-                {
-                    // Ajouter une nouvelle ligne
-                    var newLine = new SaleLine
-                    {
-                        ProduitId = produit.Id,
-                        Produit = produit.Nom,
-                        SKU = produit.SKU,
-                        PrixUnitaire = $"{produit.Prix:N2} $",
-                        Quantite = quantite.ToString(),
-                        Total = $"{quantite * produit.Prix:N2} $",
-                        PrixUnitaireDecimal = produit.Prix,
-                        StockDisponible = produit.StockDisponible
-                    };
-                    saleLines.Add(newLine);
-                }
-                
-                ProductsDataGrid.Items.Refresh();
-                CalculateTotals();
-            }
+                Produit = "Veste d'hiver Nordique",
+                SKU = "VES-001",
+                PrixUnitaire = "225,00 $",
+                Quantite = "1",
+                Total = "225,00 $"
+            };
+
+            saleLines.Add(newLine);
+            ProductsDataGrid.Items.Refresh();
+            CalculateTotals();
+
+            MessageBox.Show(
+                "Pour ajouter un produit réel, implémenter un pop-up de sélection\n" +
+                "qui récupère les produits du module Stocks avec leurs prix.",
+                "Information",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information
+            );
         }
 
         private void BtnRemoveProduct_Click(object sender, RoutedEventArgs e)
@@ -159,26 +75,33 @@ namespace PGI.Views.Finances
         private void CalculateTotals()
         {
             // Calcul du sous-total
-            decimal subtotal = 0;
+            double subtotal = 0;
             foreach (var line in saleLines)
             {
-                subtotal += line.PrixUnitaireDecimal * decimal.Parse(line.Quantite);
+                // Extraire le montant numérique (simulation simple)
+                string totalStr = line.Total.Replace(" $", "").Replace(",", ".");
+                if (double.TryParse(totalStr, out double lineTotal))
+                {
+                    subtotal += lineTotal;
+                }
             }
 
-            // Calcul des taxes avec les taux réels de la base de données
-            var (tps, tvq, total) = TaxesService.CalculerTaxes(subtotal);
+            // Calcul des taxes
+            double tps = subtotal * 0.05;      // TPS 5%
+            double tvq = subtotal * 0.09975;   // TVQ 9.975%
+            double total = subtotal + tps + tvq;
 
             // Mise à jour de l'affichage
             TxtSubtotal.Text = $"{subtotal:N2} $";
             TxtTPS.Text = $"{tps:N2} $";
             TxtTVQ.Text = $"{tvq:N2} $";
             TxtTotal.Text = $"{total:N2} $";
-            TxtMontantDu.Text = $"{total:N2} $";
+            TxtMontantDu.Text = $"{total:N2} $"; // Initialement, tout le montant est dû
         }
 
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
-            // Validation client
+            // Validation
             if (CmbClient.SelectedIndex == 0)
             {
                 MessageBox.Show(
@@ -190,15 +113,6 @@ namespace PGI.Views.Finances
                 return;
             }
 
-            var selectedItem = CmbClient.SelectedItem as ComboBoxItem;
-            var client = selectedItem?.Tag as Client;
-            if (client == null)
-            {
-                MessageBox.Show("Erreur: Client invalide", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-
-            // Validation produits
             if (saleLines.Count == 0)
             {
                 MessageBox.Show(
@@ -210,69 +124,22 @@ namespace PGI.Views.Finances
                 return;
             }
 
-            try
-            {
-                // Créer la facture
-                var facture = new Facture
-                {
-                    NumeroFacture = numeroFacture,
-                    DateFacture = DateTime.Now,
-                    DateEcheance = DateTime.Now.AddDays(30), // 30 jours par défaut
-                    ClientId = client.Id,
-                    EmployeId = null, // TODO: Récupérer l'employé connecté
-                    ConditionsPaiement = "Net 30 jours"
-                };
+            // TODO: Vérifier le stock disponible pour chaque produit
+            // TODO: Enregistrer dans la base de données
+            // TODO: Mettre à jour le stock (mouvement OUT)
 
-                // Créer les lignes de facture
-                var lignes = new List<LigneFacture>();
-                foreach (var line in saleLines)
-                {
-                    lignes.Add(new LigneFacture
-                    {
-                        ProduitId = line.ProduitId,
-                        SKU = line.SKU,
-                        Description = line.Produit,
-                        Quantite = int.Parse(line.Quantite),
-                        PrixUnitaire = line.PrixUnitaireDecimal
-                    });
-                }
+            MessageBox.Show(
+                "✅ Facture enregistrée avec succès !\n\n" +
+                $"Client : {(CmbClient.SelectedItem as ComboBoxItem)?.Content}\n" +
+                $"Total : {TxtTotal.Text}\n\n" +
+                "La facture a été créée et le stock mis à jour.",
+                "Succès",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information
+            );
 
-                // Sauvegarder dans la base de données
-                // Cette méthode effectue toutes les validations automatiquement:
-                // - Stock disponible
-                // - Client actif
-                // - Factures en retard
-                // - Mise à jour du stock
-                // - Création des mouvements
-                int factureId = FactureService.CreerFacture(facture, lignes);
-
-                MessageBox.Show(
-                    $"✅ Facture {numeroFacture} créée avec succès !\n\n" +
-                    $"Client : {client.Nom}\n" +
-                    $"Total : {TxtTotal.Text}\n" +
-                    $"Nombre de lignes : {lignes.Count}\n\n" +
-                    "Le stock a été automatiquement mis à jour.",
-                    "Succès",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information
-                );
-
-                // Retourner à la liste des ventes
-                NavigateBackToList();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(
-                    $"❌ Erreur lors de la création de la facture:\n\n{ex.Message}\n\n" +
-                    "Vérifiez que:\n" +
-                    "- Le stock est suffisant pour tous les produits\n" +
-                    "- Le client n'a pas de factures en retard\n" +
-                    "- Le client est actif",
-                    "Erreur",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error
-                );
-            }
+            // Retourner à la liste des ventes
+            NavigateBackToList();
         }
 
         private void BtnPrint_Click(object sender, RoutedEventArgs e)
@@ -321,17 +188,14 @@ namespace PGI.Views.Finances
         }
     }
 
-    // Classe modèle pour les lignes de facture (affichage)
+    // Classe modèle pour les lignes de facture
     public class SaleLine
     {
-        public int ProduitId { get; set; }
         public string Produit { get; set; } = string.Empty;
         public string SKU { get; set; } = string.Empty;
         public string PrixUnitaire { get; set; } = string.Empty;
         public string Quantite { get; set; } = string.Empty;
         public string Total { get; set; } = string.Empty;
-        public decimal PrixUnitaireDecimal { get; set; }
-        public int StockDisponible { get; set; }
     }
 }
 

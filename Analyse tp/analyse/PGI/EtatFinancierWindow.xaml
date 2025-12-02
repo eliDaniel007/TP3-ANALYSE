@@ -1,0 +1,80 @@
+<Window x:Class="PGI.EtatFinancierWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="État financier détaillé" Height="700" Width="900"
+        Background="#F8FAFC">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <TextBlock Text="État financier simplifié - Nordik Adventures" 
+                   FontWeight="Bold" FontSize="18" Foreground="#1E3A8A" Margin="0,0,0,16"/>
+        <ScrollViewer Grid.Row="1">
+            <StackPanel>
+                <GroupBox Header="Revenus" Margin="0,0,0,12">
+                    <StackPanel Margin="12">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="Ventes totales:" FontWeight="SemiBold" Width="300"/>
+                            <TextBlock Text="$ 450 000" FontWeight="Bold" Foreground="#1E3A8A" FontSize="14"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="Autres revenus:" Width="300"/>
+                            <TextBlock Text="$ 5 000" Foreground="#64748B"/>
+                        </StackPanel>
+                        <Separator Margin="0,8,0,8"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Total revenus:" FontWeight="Bold" FontSize="14" Width="300"/>
+                            <TextBlock Text="$ 455 000" FontWeight="Bold" FontSize="14" Foreground="#1E3A8A"/>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="Coûts et dépenses" Margin="0,0,0,12">
+                    <StackPanel Margin="12">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="Coût des produits vendus:" FontWeight="SemiBold" Width="300"/>
+                            <TextBlock Text="$ 280 000" Foreground="#64748B" FontSize="14"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="Salaires:" Width="300"/>
+                            <TextBlock Text="$ 50 000" Foreground="#64748B"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="Dépenses d'exploitation:" Width="300"/>
+                            <TextBlock Text="$ 30 000" Foreground="#64748B"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="Amortissement:" Width="300"/>
+                            <TextBlock Text="$ 5 000" Foreground="#64748B"/>
+                        </StackPanel>
+                        <Separator Margin="0,8,0,8"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Total dépenses:" FontWeight="Bold" FontSize="14" Width="300"/>
+                            <TextBlock Text="$ 365 000" FontWeight="Bold" FontSize="14" Foreground="#64748B"/>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="Résultat" Margin="0,0,0,12">
+                    <StackPanel Margin="12">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="Profit brut:" FontWeight="SemiBold" Width="300"/>
+                            <TextBlock Text="$ 170 000" FontWeight="Bold" Foreground="#10B981" FontSize="14"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="Dépenses opérationnelles:" Width="300"/>
+                            <TextBlock Text="$ 85 000" Foreground="#64748B"/>
+                        </StackPanel>
+                        <Separator Margin="0,8,0,8"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Profit net:" FontWeight="Bold" FontSize="16" Width="300"/>
+                            <TextBlock Text="$ 90 000" FontWeight="Bold" FontSize="16" Foreground="#10B981"/>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>
+

@@ -28,6 +28,116 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        
+        <Style x:Key="TabButtonStyle" TargetType="Button">
+            <Setter Property="Padding" Value="20,12"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#64748B"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                BorderThickness="0,0,0,3"
+                                BorderBrush="{TemplateBinding Foreground}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <Style x:Key="ActiveTabButtonStyle" TargetType="Button" BasedOn="{StaticResource TabButtonStyle}">
+            <Setter Property="Foreground" Value="#003049"/>
+            <Setter Property="Background" Value="#F1F5F9"/>
+        </Style>
+        
+        <Style x:Key="ProductButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#669BBC"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="6" 
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <Style x:Key="OrderButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#10B981"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="15,12"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="8" 
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <Style x:Key="ClearButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#FEE2E2"/>
+            <Setter Property="Foreground" Value="#DC2626"/>
+            <Setter Property="Padding" Value="15,12"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="8" 
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <Style x:Key="DetailButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#669BBC"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="6" 
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
     
     <Grid>
@@ -56,6 +166,12 @@
                              Foreground="White" 
                              VerticalAlignment="Center"
                              Margin="0,0,20,0"/>
+                    <Button x:Name="BtnPanierHeader" 
+                          Content="🛒 Panier (0)" 
+                          Style="{StaticResource ModernButton}"
+                          Background="#10B981"
+                          Margin="0,0,10,0"
+                          Click="BtnPanierHeader_Click"/>
                     <Button x:Name="LogoutButton" 
                           Content="🚪 Déconnexion" 
                           Style="{StaticResource ModernButton}"
@@ -65,56 +181,451 @@
             </Grid>
         </Border>
         
+        <!-- Navigation Tabs -->
+        <Border Background="White" Height="60" VerticalAlignment="Top" Margin="0,70,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Button x:Name="BtnTabCatalogue" 
+                        Content="📦 Catalogue" 
+                        Style="{StaticResource ActiveTabButtonStyle}"
+                        Click="BtnTabCatalogue_Click"/>
+                <Button x:Name="BtnTabPanier" 
+                        Content="🛒 Panier" 
+                        Style="{StaticResource TabButtonStyle}"
+                        Click="BtnTabPanier_Click"/>
+                <Button x:Name="BtnTabCommandes" 
+                        Content="📋 Mes Commandes" 
+                        Style="{StaticResource TabButtonStyle}"
+                        Click="BtnTabCommandes_Click"/>
+                <Button x:Name="BtnTabHistorique" 
+                        Content="📊 Historique" 
+                        Style="{StaticResource TabButtonStyle}"
+                        Click="BtnTabHistorique_Click"/>
+            </StackPanel>
+        </Border>
+        
         <!-- Contenu principal -->
-        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,70,0,0">
-            <StackPanel Margin="40" VerticalAlignment="Top">
-                <TextBlock Text="Bienvenue sur notre site d'achat ! 🎉" 
-                         FontSize="28" 
-                         FontWeight="Bold" 
-                         Foreground="#003049"
-                         Margin="0,0,0,20"/>
-                
-                <TextBlock Text="Cette page est en cours de développement. Vous pourrez bientôt parcourir nos produits et passer des commandes." 
-                         FontSize="16" 
-                         Foreground="#64748B"
-                         TextWrapping="Wrap"
-                         Margin="0,0,0,30"/>
-                
-                <Border Background="White" 
-                      CornerRadius="12" 
-                      Padding="30"
-                      BorderBrush="#669BBC"
-                      BorderThickness="2">
+        <ScrollViewer x:Name="MainScrollViewer" VerticalScrollBarVisibility="Auto" Margin="0,130,0,0">
+            <Grid x:Name="MainContentGrid" Margin="40">
+                <!-- Onglet Catalogue -->
+                <Grid x:Name="CatalogueGrid" Visibility="Visible">
                     <StackPanel>
-                        <TextBlock Text="📦 Fonctionnalités à venir :" 
-                                 FontSize="18" 
+                        <TextBlock Text="Catalogue de Produits" 
+                                 FontSize="28" 
                                  FontWeight="Bold" 
                                  Foreground="#003049"
-                                 Margin="0,0,0,15"/>
+                                 Margin="0,0,0,20"/>
                         
-                        <TextBlock Text="✓ Catalogue de produits" 
-                                 FontSize="14" 
-                                 Foreground="#475569"
-                                 Margin="0,0,0,10"/>
-                        <TextBlock Text="✓ Panier d'achat" 
-                                 FontSize="14" 
-                                 Foreground="#475569"
-                                 Margin="0,0,0,10"/>
-                        <TextBlock Text="✓ Passer commande" 
-                                 FontSize="14" 
-                                 Foreground="#475569"
-                                 Margin="0,0,0,10"/>
-                        <TextBlock Text="✓ Suivi de commandes" 
-                                 FontSize="14" 
-                                 Foreground="#475569"
-                                 Margin="0,0,0,10"/>
-                        <TextBlock Text="✓ Historique des achats" 
-                                 FontSize="14" 
-                                 Foreground="#475569"/>
+                        <!-- Barre de recherche et filtres -->
+                        <Border Background="White" 
+                              CornerRadius="12" 
+                              Padding="20"
+                              Margin="0,0,0,20"
+                              BorderBrush="#E2E8F0"
+                              BorderThickness="1">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <Border BorderBrush="#E2E8F0"
+                                      BorderThickness="1"
+                                      CornerRadius="8"
+                                      Background="White">
+                                    <TextBox x:Name="TxtSearch" 
+                                           Text="Rechercher un produit..." 
+                                           FontSize="14"
+                                           Padding="15,10"
+                                           BorderThickness="0"
+                                           Background="Transparent"
+                                           TextChanged="TxtSearch_TextChanged"
+                                           GotFocus="TxtSearch_GotFocus"
+                                           LostFocus="TxtSearch_LostFocus"/>
+                                </Border>
+                                
+                                <ComboBox x:Name="CmbCategorie" 
+                                        Grid.Column="1"
+                                        Margin="10,0,0,0"
+                                        Width="250"
+                                        Padding="15,10"
+                                        FontSize="14"
+                                        SelectionChanged="CmbCategorie_SelectionChanged"/>
+                            </Grid>
+                        </Border>
+                        
+                        <!-- Grille de produits -->
+                        <ItemsControl x:Name="ProductsItemsControl">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="3" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="White" 
+                                          CornerRadius="12" 
+                                          Padding="20"
+                                          Margin="0,0,20,20"
+                                          BorderBrush="#E2E8F0"
+                                          BorderThickness="1">
+                                        <StackPanel>
+                                            <!-- Image du produit -->
+                                            <Border Background="#F8FAFC" 
+                                                  CornerRadius="8" 
+                                                  Height="200" 
+                                                  Margin="0,0,0,15">
+                                                <Image Source="{Binding ImagePath}" 
+                                                     Stretch="Uniform" 
+                                                     HorizontalAlignment="Center"
+                                                     VerticalAlignment="Center"/>
+                                            </Border>
+                                            
+                                            <TextBlock Text="{Binding NomCategorie}" 
+                                                     FontSize="12" 
+                                                     Foreground="#64748B"
+                                                     Margin="0,0,0,8"/>
+                                            <TextBlock Text="{Binding Nom}" 
+                                                     FontSize="18" 
+                                                     FontWeight="Bold"
+                                                     Foreground="#003049"
+                                                     TextWrapping="Wrap"
+                                                     Margin="0,0,0,8"/>
+                                            <TextBlock Text="{Binding Description}" 
+                                                     FontSize="13" 
+                                                     Foreground="#64748B"
+                                                     TextWrapping="Wrap"
+                                                     MaxHeight="60"
+                                                     Margin="0,0,0,12"/>
+                                            <TextBlock Text="{Binding Prix, StringFormat='{}{0:C}'}" 
+                                                     FontSize="20" 
+                                                     FontWeight="Bold"
+                                                     Foreground="#10B981"
+                                                     Margin="0,0,0,8"/>
+                                            <TextBlock Text="{Binding StockInfo}" 
+                                                     FontSize="12" 
+                                                     Foreground="#64748B"
+                                                     Margin="0,0,0,12"/>
+                                            <Button Content="➕ Ajouter au panier" 
+                                                  Style="{StaticResource ProductButtonStyle}"
+                                                  Click="BtnAddToCart_Click"/>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </StackPanel>
-                </Border>
-            </StackPanel>
+                </Grid>
+                
+                <!-- Onglet Panier -->
+                <Grid x:Name="PanierGrid" Visibility="Collapsed">
+                    <StackPanel>
+                        <TextBlock Text="Mon Panier" 
+                                 FontSize="28" 
+                                 FontWeight="Bold" 
+                                 Foreground="#003049"
+                                 Margin="0,0,0,20"/>
+                        
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="350"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <!-- Liste des articles -->
+                            <Border Background="White" 
+                                  CornerRadius="12" 
+                                  Padding="20"
+                                  Margin="0,0,20,0"
+                                  BorderBrush="#E2E8F0"
+                                  BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="Articles dans votre panier" 
+                                             FontSize="18" 
+                                             FontWeight="SemiBold"
+                                             Foreground="#003049"
+                                             Margin="0,0,0,20"/>
+                                    
+                                    <ItemsControl x:Name="PanierItemsControl">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="#F8FAFC" 
+                                                      CornerRadius="8" 
+                                                      Padding="15"
+                                                      Margin="0,0,0,15"
+                                                      BorderBrush="#E2E8F0"
+                                                      BorderThickness="1">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        
+                                                        <StackPanel Grid.Column="0">
+                                                            <TextBlock Text="{Binding Nom}" 
+                                                                     FontSize="16" 
+                                                                     FontWeight="SemiBold"
+                                                                     Foreground="#003049"
+                                                                     Margin="0,0,0,5"/>
+                                                            <TextBlock Text="{Binding SKU}" 
+                                                                     FontSize="12" 
+                                                                     Foreground="#64748B"
+                                                                     Margin="0,0,0,5"/>
+                                                            <TextBlock Text="{Binding Prix, StringFormat='{}{0:C}'}" 
+                                                                     FontSize="14" 
+                                                                     Foreground="#10B981"/>
+                                                        </StackPanel>
+                                                        
+                                                        <StackPanel Grid.Column="1" 
+                                                                  Orientation="Horizontal" 
+                                                                  VerticalAlignment="Center"
+                                                                  Margin="20,0">
+                                                            <Button Content="-" 
+                                                                  Width="35" 
+                                                                  Height="35"
+                                                                  Background="#E2E8F0"
+                                                                  Foreground="#003049"
+                                                                  FontWeight="Bold"
+                                                                  Click="BtnDecreaseQuantity_Click"
+                                                                  Tag="{Binding}"/>
+                                                            <TextBlock Text="{Binding Quantite}" 
+                                                                     FontSize="16" 
+                                                                     FontWeight="SemiBold"
+                                                                     Width="50"
+                                                                     TextAlignment="Center"
+                                                                     VerticalAlignment="Center"
+                                                                     Margin="10,0"/>
+                                                            <Button Content="+" 
+                                                                  Width="35" 
+                                                                  Height="35"
+                                                                  Background="#669BBC"
+                                                                  Foreground="White"
+                                                                  FontWeight="Bold"
+                                                                  Click="BtnIncreaseQuantity_Click"
+                                                                  Tag="{Binding}"/>
+                                                        </StackPanel>
+                                                        
+                                                        <TextBlock Grid.Column="2" 
+                                                                 Text="{Binding SousTotal, StringFormat='{}{0:C}'}" 
+                                                                 FontSize="16" 
+                                                                 FontWeight="Bold"
+                                                                 Foreground="#003049"
+                                                                 VerticalAlignment="Center"
+                                                                 Margin="20,0"/>
+                                                        
+                                                        <Button Grid.Column="3" 
+                                                              Content="🗑️" 
+                                                              Width="40" 
+                                                              Height="40"
+                                                              Background="#FEE2E2"
+                                                              Foreground="#DC2626"
+                                                              FontSize="16"
+                                                              Click="BtnRemoveFromCart_Click"
+                                                              Tag="{Binding}"
+                                                              Margin="20,0,0,0"/>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    
+                                    <TextBlock x:Name="TxtPanierVide" 
+                                             Text="Votre panier est vide" 
+                                             FontSize="16" 
+                                             Foreground="#64748B"
+                                             HorizontalAlignment="Center"
+                                             Margin="0,40"
+                                             Visibility="Collapsed"/>
+                                </StackPanel>
+                            </Border>
+                            
+                            <!-- Résumé de commande -->
+                            <Border Grid.Column="1" 
+                                  Background="White" 
+                                  CornerRadius="12" 
+                                  Padding="20"
+                                  BorderBrush="#E2E8F0"
+                                  BorderThickness="1"
+                                  Height="400">
+                                <StackPanel>
+                                    <TextBlock Text="Résumé de la commande" 
+                                             FontSize="18" 
+                                             FontWeight="SemiBold"
+                                             Foreground="#003049"
+                                             Margin="0,0,0,20"/>
+                                    
+                                    <Grid Margin="0,0,0,15">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="Sous-total" 
+                                                 FontSize="14" 
+                                                 Foreground="#64748B"/>
+                                        <TextBlock x:Name="TxtSousTotal" 
+                                                 Grid.Column="1"
+                                                 Text="0,00 $" 
+                                                 FontSize="14" 
+                                                 FontWeight="SemiBold"
+                                                 Foreground="#003049"/>
+                                    </Grid>
+                                    
+                                    <Grid Margin="0,0,0,15">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="TPS (5%)" 
+                                                 FontSize="14" 
+                                                 Foreground="#64748B"/>
+                                        <TextBlock x:Name="TxtTPS" 
+                                                 Grid.Column="1"
+                                                 Text="0,00 $" 
+                                                 FontSize="14" 
+                                                 FontWeight="SemiBold"
+                                                 Foreground="#003049"/>
+                                    </Grid>
+                                    
+                                    <Grid Margin="0,0,0,15">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="TVQ (9.975%)" 
+                                                 FontSize="14" 
+                                                 Foreground="#64748B"/>
+                                        <TextBlock x:Name="TxtTVQ" 
+                                                 Grid.Column="1"
+                                                 Text="0,00 $" 
+                                                 FontSize="14" 
+                                                 FontWeight="SemiBold"
+                                                 Foreground="#003049"/>
+                                    </Grid>
+                                    
+                                    <Border Background="#F1F5F9" 
+                                          Height="2" 
+                                          Margin="0,10,0,15"/>
+                                    
+                                    <Grid Margin="0,0,0,20">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="Total" 
+                                                 FontSize="18" 
+                                                 FontWeight="Bold"
+                                                 Foreground="#003049"/>
+                                        <TextBlock x:Name="TxtTotal" 
+                                                 Grid.Column="1"
+                                                 Text="0,00 $" 
+                                                 FontSize="20" 
+                                                 FontWeight="Bold"
+                                                 Foreground="#10B981"/>
+                                    </Grid>
+                                    
+                                    <Button x:Name="BtnPasserCommande" 
+                                          Content="✅ Passer la commande" 
+                                          Style="{StaticResource OrderButtonStyle}"
+                                          Click="BtnPasserCommande_Click"
+                                          IsEnabled="False"/>
+                                    
+                                    <Button x:Name="BtnViderPanier" 
+                                          Content="🗑️ Vider le panier" 
+                                          Style="{StaticResource ClearButtonStyle}"
+                                          Margin="0,10,0,0"
+                                          Click="BtnViderPanier_Click"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+                
+                <!-- Onglet Mes Commandes -->
+                <Grid x:Name="CommandesGrid" Visibility="Collapsed">
+                    <StackPanel>
+                        <TextBlock Text="Mes Commandes" 
+                                 FontSize="28" 
+                                 FontWeight="Bold" 
+                                 Foreground="#003049"
+                                 Margin="0,0,0,20"/>
+                        
+                        <Border Background="White" 
+                              CornerRadius="12" 
+                              Padding="20"
+                              BorderBrush="#E2E8F0"
+                              BorderThickness="1">
+                            <DataGrid x:Name="CommandesDataGrid" 
+                                    AutoGenerateColumns="False"
+                                    HeadersVisibility="Column"
+                                    BorderThickness="0"
+                                    GridLinesVisibility="None"
+                                    RowBackground="White"
+                                    AlternatingRowBackground="#F8FAFC">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="N° Commande" Binding="{Binding NumeroCommande}" Width="150"/>
+                                    <DataGridTextColumn Header="Date" Binding="{Binding DateCommande, StringFormat='{}{0:dd/MM/yyyy}'}" Width="120"/>
+                                    <DataGridTextColumn Header="Statut" Binding="{Binding Statut}" Width="120">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                                                <Setter Property="Padding" Value="8,4"/>
+                                                <Setter Property="Background" Value="#E2E8F0"/>
+                                                <Setter Property="Foreground" Value="#003049"/>
+                                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn Header="Montant" Binding="{Binding MontantTotal, StringFormat='{}{0:C}'}" Width="120"/>
+                                    <DataGridTemplateColumn Header="Actions" Width="150">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Content="👁️ Voir détails" 
+                                                      Style="{StaticResource DetailButtonStyle}"
+                                                      Click="BtnVoirDetailsCommande_Click"
+                                                      Tag="{Binding}"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+                
+                <!-- Onglet Historique -->
+                <Grid x:Name="HistoriqueGrid" Visibility="Collapsed">
+                    <StackPanel>
+                        <TextBlock Text="Historique des Achats" 
+                                 FontSize="28" 
+                                 FontWeight="Bold" 
+                                 Foreground="#003049"
+                                 Margin="0,0,0,20"/>
+                        
+                        <Border Background="White" 
+                              CornerRadius="12" 
+                              Padding="20"
+                              BorderBrush="#E2E8F0"
+                              BorderThickness="1">
+                            <DataGrid x:Name="HistoriqueDataGrid" 
+                                    AutoGenerateColumns="False"
+                                    HeadersVisibility="Column"
+                                    BorderThickness="0"
+                                    GridLinesVisibility="None"
+                                    RowBackground="White"
+                                    AlternatingRowBackground="#F8FAFC">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="N° Commande" Binding="{Binding NumeroCommande}" Width="150"/>
+                                    <DataGridTextColumn Header="Date" Binding="{Binding DateCommande, StringFormat='{}{0:dd/MM/yyyy}'}" Width="120"/>
+                                    <DataGridTextColumn Header="Statut" Binding="{Binding Statut}" Width="120"/>
+                                    <DataGridTextColumn Header="Montant" Binding="{Binding MontantTotal, StringFormat='{}{0:C}'}" Width="120"/>
+                                    <DataGridTextColumn Header="Articles" Binding="{Binding NombreArticles}" Width="100"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Grid>
         </ScrollViewer>
     </Grid>
 </Window>
-

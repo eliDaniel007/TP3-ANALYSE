@@ -12,4 +12,20 @@
     <PackageReference Include="MySql.Data" Version="9.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Images des produits depuis le dossier racine -->
+    <Content Include="..\..\..\assets\IMAGES PRODUITS\*.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>assets\IMAGES PRODUITS\%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\..\..\assets\IMAGES PRODUITS\*.jpeg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>assets\IMAGES PRODUITS\%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="..\..\..\assets\IMAGES PRODUITS\*.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>assets\IMAGES PRODUITS\%(Filename)%(Extension)</Link>
+    </Content>
+  </ItemGroup>
+
 </Project>

@@ -9,7 +9,6 @@ namespace PGI.Models
         public string Nom { get; set; } = string.Empty;
         public string Prenom { get; set; } = string.Empty;
         public string Courriel { get; set; } = string.Empty;
-        public string MotDePasse { get; set; } = string.Empty; // Pour l'authentification
         public string? Telephone { get; set; }
         public string Departement { get; set; } = "Autre";
         public string Poste { get; set; } = string.Empty;

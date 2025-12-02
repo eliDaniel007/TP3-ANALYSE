@@ -172,32 +172,6 @@ namespace PGI.Views.Stocks
             }
         }
 
-        // Méthode publique pour naviguer vers le formulaire catégorie (appelée depuis CategoriesView)
-        public void NavigateToCategoryForm(int? categorieId = null)
-        {
-            try
-            {
-                CategoryFormView formView;
-                if (categorieId.HasValue)
-                {
-                    // Mode édition : passer l'ID de la catégorie
-                    formView = new CategoryFormView(categorieId.Value);
-                }
-                else
-                {
-                    // Mode ajout : nouvelle catégorie
-                    formView = new CategoryFormView();
-                }
-                
-                StocksContentArea.Content = formView;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Erreur : {ex.Message}", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
-                Console.WriteLine($"Erreur lors de la navigation vers CategoryFormView: {ex.Message}");
-            }
-        }
-
         // Méthode publique pour rafraîchir la liste des catégories (appelée depuis CategoryFormView après sauvegarde)
         public void RefreshCategoriesList()
         {
@@ -213,7 +187,7 @@ namespace PGI.Views.Stocks
             }
         }
 
-        // Méthode publique pour naviguer vers la liste des produits (appelée depuis d'autres vues)
+        // Méthode publique pour naviguer vers la liste des produits (appelée depuis ProductHistoryView)
         public void NavigateToProductsList()
         {
             BtnProducts_Click(null, null);
