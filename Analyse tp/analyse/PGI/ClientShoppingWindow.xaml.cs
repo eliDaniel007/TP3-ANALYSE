@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using PGI.Models;
 using PGI.Services;
+using PGI.Helpers;
 
 namespace PGI
 {
@@ -34,6 +35,16 @@ namespace PGI
             
             WelcomeText.Text = $"Bienvenue, {name} !";
             
+            // Mettre à jour le message d'accueil avec le nom du client
+            if (TxtBienvenue != null)
+            {
+                TxtBienvenue.Text = $"Bienvenue, {name} !";
+            }
+            if (TxtMessageAccueil != null)
+            {
+                TxtMessageAccueil.Text = $"Nous sommes ravis de vous accueillir sur Nordik Adventures !";
+            }
+            
             // Charger les données
             LoadProduits();
             LoadCategories();
@@ -42,15 +53,8 @@ namespace PGI
             // Initialiser l'interface
             UpdatePanierHeader();
             
-            // Attendre que les contrôles soient complètement initialisés avant d'afficher le catalogue
-            this.Loaded += (s, e) => 
-            {
-                // Attendre un peu plus pour s'assurer que tous les contrôles sont prêts
-                Dispatcher.BeginInvoke(new Action(() => 
-                {
-                    AfficherCatalogue();
-                }), System.Windows.Threading.DispatcherPriority.Loaded);
-            };
+            // Afficher l'accueil par défaut
+            AfficherAccueil();
         }
 
         #region Chargement des données
@@ -118,6 +122,12 @@ namespace PGI
 
         #region Navigation entre onglets
 
+        private void BtnTabAccueil_Click(object sender, RoutedEventArgs e)
+        {
+            SetActiveTab(BtnTabAccueil);
+            AfficherAccueil();
+        }
+
         private void BtnTabCatalogue_Click(object sender, RoutedEventArgs e)
         {
             SetActiveTab(BtnTabCatalogue);
@@ -136,33 +146,38 @@ namespace PGI
             AfficherCommandes();
         }
 
-        private void BtnTabHistorique_Click(object sender, RoutedEventArgs e)
-        {
-            SetActiveTab(BtnTabHistorique);
-            AfficherHistorique();
-        }
-
         private void SetActiveTab(Button activeButton)
         {
             // Réinitialiser tous les styles
+            BtnTabAccueil.Style = (Style)FindResource("TabButtonStyle");
             BtnTabCatalogue.Style = (Style)FindResource("TabButtonStyle");
             BtnTabPanier.Style = (Style)FindResource("TabButtonStyle");
             BtnTabCommandes.Style = (Style)FindResource("TabButtonStyle");
-            BtnTabHistorique.Style = (Style)FindResource("TabButtonStyle");
             
             // Appliquer le style actif
             activeButton.Style = (Style)FindResource("ActiveTabButtonStyle");
             
             // Afficher/masquer les grilles
+            AccueilGrid.Visibility = activeButton == BtnTabAccueil ? Visibility.Visible : Visibility.Collapsed;
             CatalogueGrid.Visibility = activeButton == BtnTabCatalogue ? Visibility.Visible : Visibility.Collapsed;
             PanierGrid.Visibility = activeButton == BtnTabPanier ? Visibility.Visible : Visibility.Collapsed;
             CommandesGrid.Visibility = activeButton == BtnTabCommandes ? Visibility.Visible : Visibility.Collapsed;
-            HistoriqueGrid.Visibility = activeButton == BtnTabHistorique ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        private void BtnPanierHeader_Click(object sender, RoutedEventArgs e)
+        #endregion
+
+        #region Accueil
+
+        private void AfficherAccueil()
         {
-            BtnTabPanier_Click(sender, e);
+            // L'accueil est déjà affiché par défaut dans le XAML
+            // Cette méthode peut être utilisée pour mettre à jour le contenu si nécessaire
+        }
+
+        private void BtnCommencerAchat_Click(object sender, RoutedEventArgs e)
+        {
+            // Naviguer vers le catalogue
+            BtnTabCatalogue_Click(sender, e);
         }
 
         #endregion
@@ -281,25 +296,51 @@ namespace PGI
                     return;
                 }
                 
-                // Créer un item de panier
-                var panierItem = new PanierItem
-                {
-                    ProduitId = produit.Id,
-                    SKU = produit.SKU,
-                    Nom = produit.Nom,
-                    Description = produit.Description,
-                    Prix = produit.Prix,
-                    Quantite = 1,
-                    StockDisponible = produit.StockDisponible,
-                    Categorie = produit.NomCategorie
-                };
+                // Vérifier si le produit est déjà dans le panier
+                var existingItem = panier.Items.FirstOrDefault(i => i.ProduitId == produit.Id);
                 
-                // Ajouter au panier
-                panier.AjouterProduit(panierItem);
+                if (existingItem != null)
+                {
+                    // Produit déjà dans le panier, incrémenter la quantité
+                    int nouvelleQuantite = existingItem.Quantite + 1;
+                    if (nouvelleQuantite > produit.StockDisponible)
+                    {
+                        MessageBox.Show($"Stock insuffisant. Stock disponible : {produit.StockDisponible}", 
+                            "Stock indisponible", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+                    panier.ModifierQuantite(produit.Id, nouvelleQuantite);
+                    MessageBox.Show($"✅ Quantité mise à jour : {produit.Nom} (x{nouvelleQuantite})", 
+                        "Panier mis à jour", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    // Nouveau produit, créer un item de panier
+                    var panierItem = new PanierItem
+                    {
+                        ProduitId = produit.Id,
+                        SKU = produit.SKU,
+                        Nom = produit.Nom,
+                        Description = produit.Description,
+                        Prix = produit.Prix,
+                        Quantite = 1,
+                        StockDisponible = produit.StockDisponible,
+                        Categorie = produit.NomCategorie
+                    };
+                    
+                    // Ajouter au panier
+                    panier.AjouterProduit(panierItem);
+                    MessageBox.Show($"✅ {produit.Nom} ajouté au panier !", 
+                        "Produit ajouté", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
                 
                 UpdatePanierHeader();
-                MessageBox.Show($"✅ {produit.Nom} ajouté au panier !", 
-                    "Produit ajouté", MessageBoxButton.OK, MessageBoxImage.Information);
+                
+                // Rafraîchir l'affichage du panier si on est sur l'onglet panier
+                if (PanierGrid.Visibility == Visibility.Visible)
+                {
+                    AfficherPanier();
+                }
             }
             catch (Exception ex)
             {
@@ -322,6 +363,8 @@ namespace PGI
             }
             else
             {
+                // Forcer le rafraîchissement en réassignant l'ItemsSource
+                PanierItemsControl.ItemsSource = null;
                 PanierItemsControl.ItemsSource = panier.Items;
                 TxtPanierVide.Visibility = Visibility.Collapsed;
                 BtnPasserCommande.IsEnabled = true;
@@ -350,8 +393,15 @@ namespace PGI
             {
                 try
                 {
-                    panier.ModifierQuantite(item.ProduitId, item.Quantite + 1);
-                    AfficherPanier();
+                    int nouvelleQuantite = item.Quantite + 1;
+                    panier.ModifierQuantite(item.ProduitId, nouvelleQuantite);
+                    
+                    // Forcer la mise à jour de l'affichage
+                    var items = PanierItemsControl.ItemsSource;
+                    PanierItemsControl.ItemsSource = null;
+                    PanierItemsControl.ItemsSource = items;
+                    
+                    UpdatePanierSummary();
                     UpdatePanierHeader();
                 }
                 catch (Exception ex)
@@ -368,8 +418,15 @@ namespace PGI
             {
                 try
                 {
-                    panier.ModifierQuantite(item.ProduitId, item.Quantite - 1);
-                    AfficherPanier();
+                    int nouvelleQuantite = item.Quantite - 1;
+                    panier.ModifierQuantite(item.ProduitId, nouvelleQuantite);
+                    
+                    // Forcer la mise à jour de l'affichage
+                    var items = PanierItemsControl.ItemsSource;
+                    PanierItemsControl.ItemsSource = null;
+                    PanierItemsControl.ItemsSource = items;
+                    
+                    UpdatePanierSummary();
                     UpdatePanierHeader();
                 }
                 catch (Exception ex)
@@ -483,7 +540,7 @@ namespace PGI
                     decimal tvq = sousTotal * 0.09975m;
                     decimal totalAvecTaxes = sousTotal + tps + tvq;
                     
-                    // Créer la commande
+                    // 1. Créer la commande
                     var commande = new Commande
                     {
                         ClientId = clientId,
@@ -509,18 +566,69 @@ namespace PGI
                     // Enregistrer la commande
                     int commandeId = CommandeService.CreateCommande(commande);
                     
+                    // 2. Créer une facture (FactureService décrémente automatiquement le stock)
+                    var facture = new Facture
+                    {
+                        ClientId = clientId,
+                        EmployeId = null, // Commande client, pas d'employé
+                        DateFacture = DateTime.Now,
+                        DateEcheance = DateTime.Now.AddDays(30),
+                        ConditionsPaiement = "Paiement immédiat"
+                    };
+                    facture.NumeroFacture = FactureService.GenererNumeroFacture();
+                    
+                    // Convertir les items du panier en lignes de facture
+                    var lignesFacture = new List<LigneFacture>();
+                    foreach (var item in panier.Items)
+                    {
+                        lignesFacture.Add(new LigneFacture
+                        {
+                            ProduitId = item.ProduitId,
+                            SKU = item.SKU,
+                            Description = item.Nom,
+                            Quantite = item.Quantite,
+                            PrixUnitaire = item.Prix
+                        });
+                    }
+                    
+                    // Créer la facture (décrémente le stock automatiquement)
+                    int factureId = FactureService.CreerFacture(facture, lignesFacture);
+                    
+                    // 3. Marquer la facture comme payée (commande payée immédiatement)
+                    string updateQuery = @"
+                        UPDATE factures 
+                        SET statut_paiement = 'Payée', 
+                            montant_paye = montant_total,
+                            montant_du = 0
+                        WHERE id = @factureId";
+                    var parameters = new Dictionary<string, object> { { "@factureId", factureId } };
+                    DatabaseHelper.ExecuteNonQuery(updateQuery, parameters);
+                    
                     MessageBox.Show(
                         $"✅ Commande créée avec succès !\n\n" +
                         $"Numéro de commande : {commande.NumeroCommande}\n" +
+                        $"Numéro de facture : {facture.NumeroFacture}\n" +
                         $"Montant total : {commande.MontantTotal:C}",
                         "Commande confirmée",
                         MessageBoxButton.OK,
                         MessageBoxImage.Information);
                     
+                    // 5. Afficher le sondage
+                    AfficherSondage(factureId);
+                    
                     // Vider le panier
                     panier.Vider();
                     AfficherPanier();
                     UpdatePanierHeader();
+                    
+                    // Recharger les produits pour mettre à jour le stock affiché
+                    LoadProduits();
+                    
+                    // Si on est sur l'onglet catalogue, rafraîchir l'affichage
+                    if (CatalogueGrid.Visibility == Visibility.Visible)
+                    {
+                        AfficherCatalogue();
+                    }
                     
                     // Recharger les commandes
                     LoadCommandes();
@@ -535,10 +643,134 @@ namespace PGI
                 }
             }
         }
+        
+        private void AfficherSondage(int factureId)
+        {
+            var sondageWindow = new Window
+            {
+                Title = "Sondage de satisfaction",
+                Width = 500,
+                Height = 400,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                Owner = this
+            };
+            
+            var stackPanel = new StackPanel { Margin = new Thickness(20) };
+            
+            stackPanel.Children.Add(new TextBlock 
+            { 
+                Text = "Merci pour votre achat !", 
+                FontSize = 20, 
+                FontWeight = FontWeights.Bold,
+                Margin = new Thickness(0, 0, 0, 10)
+            });
+            
+            stackPanel.Children.Add(new TextBlock 
+            { 
+                Text = "Votre avis nous intéresse. Veuillez évaluer votre expérience :", 
+                FontSize = 14,
+                Margin = new Thickness(0, 0, 0, 20),
+                TextWrapping = TextWrapping.Wrap
+            });
+            
+            // Note de satisfaction
+            stackPanel.Children.Add(new TextBlock 
+            { 
+                Text = "Note de satisfaction (1 à 5) :", 
+                FontSize = 14,
+                FontWeight = FontWeights.SemiBold,
+                Margin = new Thickness(0, 0, 0, 10)
+            });
+            
+            var cmbNote = new ComboBox
+            {
+                Width = 100,
+                Margin = new Thickness(0, 0, 0, 20)
+            };
+            for (int i = 1; i <= 5; i++)
+            {
+                cmbNote.Items.Add(i);
+            }
+            cmbNote.SelectedIndex = 4; // Par défaut 5
+            stackPanel.Children.Add(cmbNote);
+            
+            // Commentaire
+            stackPanel.Children.Add(new TextBlock 
+            { 
+                Text = "Commentaire (optionnel) :", 
+                FontSize = 14,
+                FontWeight = FontWeights.SemiBold,
+                Margin = new Thickness(0, 0, 0, 10)
+            });
+            
+            var txtCommentaire = new TextBox 
+            { 
+                Height = 80, 
+                TextWrapping = TextWrapping.Wrap,
+                AcceptsReturn = true,
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                Margin = new Thickness(0, 0, 0, 20)
+            };
+            stackPanel.Children.Add(txtCommentaire);
+            
+            var btnEnvoyer = new Button 
+            { 
+                Content = "Envoyer", 
+                Height = 40,
+                Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981")),
+                Foreground = Brushes.White,
+                FontWeight = FontWeights.Bold
+            };
+            
+            btnEnvoyer.Click += (s, args) =>
+            {
+                try
+                {
+                    if (cmbNote.SelectedItem == null)
+                    {
+                        MessageBox.Show("Veuillez sélectionner une note.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    int note = Convert.ToInt32(cmbNote.SelectedItem);
+                    string commentaire = txtCommentaire.Text;
+                    
+                    // Créer l'évaluation dans le CRM
+                    var evaluation = new EvaluationClient
+                    {
+                        ClientId = clientId,
+                        FactureId = factureId,
+                        NoteSatisfaction = note,
+                        Commentaire = string.IsNullOrWhiteSpace(commentaire) ? null : commentaire,
+                        DateEvaluation = DateTime.Now
+                    };
+                    
+                    EvaluationClientService.CreerEvaluation(evaluation);
+                    
+                    MessageBox.Show(
+                        "Merci pour votre évaluation !",
+                        "Sondage envoyé",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                    
+                    sondageWindow.DialogResult = true;
+                    sondageWindow.Close();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Erreur lors de l'envoi du sondage : {ex.Message}", 
+                        "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            };
+            
+            stackPanel.Children.Add(btnEnvoyer);
+            sondageWindow.Content = stackPanel;
+            sondageWindow.ShowDialog();
+        }
 
         private void UpdatePanierHeader()
         {
-            BtnPanierHeader.Content = $"🛒 Panier ({panier.NombreArticles})";
+            // Le panier est maintenant uniquement dans les onglets
         }
 
         #endregion
@@ -547,9 +779,15 @@ namespace PGI
 
         private void AfficherCommandes()
         {
-            // Filtrer les commandes non annulées
+            // Recharger les commandes pour avoir les données à jour
+            LoadCommandes();
+            
+            // Filtrer les commandes non annulées, avec au moins une ligne (produit) et un montant > 0
             var commandesActives = commandesClient
-                .Where(c => c.Statut != "Annulée")
+                .Where(c => c.Statut != "Annulée" 
+                         && c.Lignes != null 
+                         && c.Lignes.Count > 0 
+                         && c.MontantTotal > 0)
                 .OrderByDescending(c => c.DateCommande)
                 .ToList();
             
@@ -659,27 +897,6 @@ namespace PGI
 
         #endregion
 
-        #region Historique
-
-        private void AfficherHistorique()
-        {
-            // Toutes les commandes (y compris annulées)
-            var historique = commandesClient
-                .OrderByDescending(c => c.DateCommande)
-                .Select(c => new
-                {
-                    c.NumeroCommande,
-                    c.DateCommande,
-                    c.Statut,
-                    c.MontantTotal,
-                    NombreArticles = c.Lignes.Sum(l => l.Quantite)
-                })
-                .ToList();
-            
-            HistoriqueDataGrid.ItemsSource = historique;
-        }
-
-        #endregion
 
         private void LogoutButton_Click(object sender, RoutedEventArgs e)
         {

@@ -27,21 +27,32 @@ namespace PGI.Views.Finances
             LoadView("Views/Finances/FinancesDashboardView.xaml");
         }
 
-        // Navigation vers Ventes/Factures
+        // Navigation vers Commandes Client
         private void BtnSales_Click(object sender, RoutedEventArgs e)
         {
             SetActiveSubNavButton(BtnSales);
+            // Utiliser une vue spécifique pour les commandes clients
+            // Pour l'instant, SalesListView est utilisé mais devrait être renommé ou adapté
             LoadView("Views/Finances/SalesListView.xaml");
         }
 
-        // Navigation vers Achats
+        // Navigation vers Achats Fournisseur
         private void BtnPurchases_Click(object sender, RoutedEventArgs e)
         {
             SetActiveSubNavButton(BtnPurchases);
             LoadView("Views/Finances/PurchasesListView.xaml");
         }
 
-        // Navigation vers Comptabilité
+        // Navigation vers Facturation
+        private void BtnInvoices_Click(object sender, RoutedEventArgs e)
+        {
+            SetActiveSubNavButton(BtnInvoices);
+            // Pour l'instant on réutilise SalesListView qui affiche les factures
+            // Idéalement on aurait une InvoicesListView séparée
+            LoadView("Views/Finances/SalesListView.xaml"); 
+        }
+
+        // Navigation vers Journal Comptable
         private void BtnAccounting_Click(object sender, RoutedEventArgs e)
         {
             SetActiveSubNavButton(BtnAccounting);

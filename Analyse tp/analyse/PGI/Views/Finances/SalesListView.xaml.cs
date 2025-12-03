@@ -17,18 +17,41 @@ namespace PGI.Views.Finances
 
         private void LoadSampleData()
         {
-            // Données d'exemple
-            allSales = new List<Sale>
+            try 
             {
-                new Sale { NumeroFacture = "F2025-1045", Date = "2025-01-28", Client = "Aventure Nordique Inc.", MontantTotal = "4 250 $", Statut = "Payée", StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981")) },
-                new Sale { NumeroFacture = "F2025-1044", Date = "2025-01-27", Client = "Plein Air Québec", MontantTotal = "3 890 $", Statut = "Partielle", StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F59E0B")) },
-                new Sale { NumeroFacture = "F2025-1043", Date = "2025-01-26", Client = "Sports Extrêmes", MontantTotal = "6 120 $", Statut = "En retard", StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#DC2626")) },
-                new Sale { NumeroFacture = "F2025-1042", Date = "2025-01-25", Client = "Équipement Pro", MontantTotal = "2 450 $", Statut = "Payée", StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981")) },
-                new Sale { NumeroFacture = "F2025-1041", Date = "2025-01-24", Client = "Randonnée Plus", MontantTotal = "5 680 $", Statut = "Payée", StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981")) },
-                new Sale { NumeroFacture = "F2025-1040", Date = "2025-01-23", Client = "Nature & Aventure", MontantTotal = "1 890 $", Statut = "Annulée", StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#6B7280")) },
-            };
+                var factures = PGI.Services.FactureService.GetAllFactures();
+                allSales = new List<Sale>();
 
-            SalesDataGrid.ItemsSource = allSales;
+                foreach (var f in factures)
+                {
+                    var sale = new Sale 
+                    { 
+                        NumeroFacture = f.NumeroFacture, 
+                        Date = f.DateFacture.ToString("yyyy-MM-dd"), 
+                        Client = f.NomClient, 
+                        MontantTotal = f.MontantTotal.ToString("C"), 
+                        Statut = f.StatutPaiement 
+                    };
+
+                    // Définir la couleur selon le statut
+                    if (sale.Statut == "Payée") 
+                        sale.StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981"));
+                    else if (sale.Statut == "Partielle") 
+                        sale.StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F59E0B"));
+                    else if (sale.Statut == "En retard" || sale.Statut == "Annulée") 
+                        sale.StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#DC2626"));
+                    else
+                        sale.StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#6B7280")); // Impayée ou autre
+
+                    allSales.Add(sale);
+                }
+
+                SalesDataGrid.ItemsSource = allSales;
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show($"Erreur lors du chargement des ventes : {ex.Message}", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void TxtSearch_GotFocus(object sender, RoutedEventArgs e)

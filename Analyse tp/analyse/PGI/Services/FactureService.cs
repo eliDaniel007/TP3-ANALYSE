@@ -228,16 +228,42 @@ namespace PGI.Services
         /// </summary>
         private static void ReduireStock(int produitId, int quantite, MySqlConnection conn, MySqlTransaction transaction)
         {
-            string query = @"
-                UPDATE niveaux_stock 
-                SET qte_disponible = qte_disponible - @quantite 
-                WHERE produit_id = @produitId";
+            // Vérifier d'abord si une ligne existe pour ce produit
+            string checkQuery = "SELECT COUNT(*) FROM niveaux_stock WHERE produit_id = @produitId";
+            int count = 0;
             
-            using (var cmd = new MySqlCommand(query, conn, transaction))
+            using (var checkCmd = new MySqlCommand(checkQuery, conn, transaction))
             {
-                cmd.Parameters.AddWithValue("@quantite", quantite);
-                cmd.Parameters.AddWithValue("@produitId", produitId);
-                cmd.ExecuteNonQuery();
+                checkCmd.Parameters.AddWithValue("@produitId", produitId);
+                var result = checkCmd.ExecuteScalar();
+                count = result != null ? Convert.ToInt32(result) : 0;
+            }
+            
+            if (count > 0)
+            {
+                // Mettre à jour le stock existant
+                string updateQuery = @"
+                    UPDATE niveaux_stock 
+                    SET qte_disponible = qte_disponible - @quantite 
+                    WHERE produit_id = @produitId";
+                
+                using (var cmd = new MySqlCommand(updateQuery, conn, transaction))
+                {
+                    cmd.Parameters.AddWithValue("@quantite", quantite);
+                    cmd.Parameters.AddWithValue("@produitId", produitId);
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    
+                    if (rowsAffected == 0)
+                    {
+                        throw new Exception($"Impossible de mettre à jour le stock pour le produit ID {produitId}");
+                    }
+                }
+            }
+            else
+            {
+                // Si aucune ligne n'existe, cela ne devrait pas arriver car le stock a été vérifié avant
+                // Mais on lance une exception pour signaler le problème
+                throw new Exception($"Aucune ligne de stock trouvée pour le produit ID {produitId}");
             }
         }
 

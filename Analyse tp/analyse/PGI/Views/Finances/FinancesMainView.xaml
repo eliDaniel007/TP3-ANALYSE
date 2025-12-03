@@ -57,19 +57,23 @@
                         Style="{StaticResource ActiveSubNavButtonStyle}"
                         Click="BtnDashboard_Click"/>
                 <Button x:Name="BtnSales" 
-                        Content="💰 Ventes / Factures" 
+                        Content="🛍️ Commandes Client" 
                         Style="{StaticResource SubNavButtonStyle}"
                         Click="BtnSales_Click"/>
                 <Button x:Name="BtnPurchases" 
-                        Content="🛒 Achats (Fournisseurs)" 
+                        Content="🏭 Achats Fournisseur" 
                         Style="{StaticResource SubNavButtonStyle}"
                         Click="BtnPurchases_Click"/>
+                <Button x:Name="BtnInvoices" 
+                        Content="📄 Facturation" 
+                        Style="{StaticResource SubNavButtonStyle}"
+                        Click="BtnInvoices_Click"/>
                 <Button x:Name="BtnAccounting" 
-                        Content="📒 Comptabilité" 
+                        Content="📒 Journal Comptable" 
                         Style="{StaticResource SubNavButtonStyle}"
                         Click="BtnAccounting_Click"/>
                 <Button x:Name="BtnReports" 
-                        Content="📄 Rapports" 
+                        Content="📑 Rapports" 
                         Style="{StaticResource SubNavButtonStyle}"
                         Click="BtnReports_Click"/>
             </StackPanel>

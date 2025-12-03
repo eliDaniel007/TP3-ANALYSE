@@ -280,6 +280,40 @@ CREATE TABLE IF NOT EXISTS paiements (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 COMMENT='Paiements reçus pour les factures';
 
+-- Table: commandes_vente (Commandes clients)
+CREATE TABLE IF NOT EXISTS commandes_vente (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    client_id INT NOT NULL,
+    numero_commande VARCHAR(50) NOT NULL UNIQUE,
+    date_commande DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    statut ENUM('Brouillon', 'Confirmée', 'Facturée', 'Annulée', 'Livrée') NOT NULL DEFAULT 'Brouillon',
+    montant_total DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    adresse_livraison TEXT,
+    notes TEXT,
+    date_creation DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE,
+    INDEX idx_client (client_id),
+    INDEX idx_numero (numero_commande),
+    INDEX idx_date (date_commande),
+    INDEX idx_statut (statut)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='Commandes passées par les clients';
+
+-- Table: lignes_commande_vente (Lignes de commande client)
+CREATE TABLE IF NOT EXISTS lignes_commande_vente (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    commande_id INT NOT NULL,
+    produit_id INT NOT NULL,
+    quantite INT NOT NULL CHECK(quantite > 0),
+    prix_unitaire DECIMAL(10,2) NOT NULL,
+    sous_total DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (commande_id) REFERENCES commandes_vente(id) ON DELETE CASCADE,
+    FOREIGN KEY (produit_id) REFERENCES produits(id) ON DELETE CASCADE,
+    INDEX idx_commande (commande_id),
+    INDEX idx_produit (produit_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='Lignes de détail des commandes clients';
+
 -- Table: commandes_fournisseurs
 CREATE TABLE IF NOT EXISTS commandes_fournisseurs (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -461,8 +495,18 @@ GROUP BY c.id, c.nom, c.statut, c.type;
 
 DELIMITER $$
 
--- Trigger: Alerte automatique pour note faible
-CREATE TRIGGER trg_evaluation_alerte_satisfaction
+-- Trigger: Marquer l'alerte AVANT insertion
+CREATE TRIGGER trg_evaluation_mark_alerte
+BEFORE INSERT ON evaluations_clients
+FOR EACH ROW
+BEGIN
+    IF NEW.note_satisfaction <= 2 THEN
+        SET NEW.alerte_generee = TRUE;
+    END IF;
+END$$
+
+-- Trigger: Créer l'alerte APRÈS insertion
+CREATE TRIGGER trg_evaluation_create_alerte
 AFTER INSERT ON evaluations_clients
 FOR EACH ROW
 BEGIN
@@ -485,8 +529,6 @@ BEGIN
             END,
             'Ouverte'
         );
-        
-        UPDATE evaluations_clients SET alerte_generee = TRUE WHERE id = NEW.id;
     END IF;
 END$$
 

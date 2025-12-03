@@ -57,14 +57,9 @@
         <Border Grid.Row="0" Background="White" CornerRadius="12,12,0,0" Padding="0" Margin="0,0,0,0"
                 BorderBrush="#E2E8F0" BorderThickness="1,1,1,0">
             <StackPanel Orientation="Horizontal" Margin="20,0">
-                <Button x:Name="BtnDashboard" 
-                        Content="📊 Tableau de bord" 
-                        Style="{StaticResource SubNavButtonStyle}"
-                        Click="BtnDashboard_Click"/>
-                
                 <Button x:Name="BtnProducts" 
                         Content="📦 Produits" 
-                        Style="{StaticResource SubNavButtonStyle}"
+                        Style="{StaticResource ActiveSubNavButtonStyle}"
                         Click="BtnProducts_Click"/>
                 
                 <Button x:Name="BtnSuppliers" 

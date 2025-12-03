@@ -11,13 +11,8 @@ namespace PGI.Views.Stocks
         public StocksMainView()
         {
             InitializeComponent();
-            // Charger le tableau de bord par défaut
-            NavigateToDashboard();
-        }
-
-        private void BtnDashboard_Click(object sender, RoutedEventArgs e)
-        {
-            NavigateToDashboard();
+            // Charger la liste des produits par défaut
+            BtnProducts_Click(null, null);
         }
 
         private ProductsListView currentProductsListView;
@@ -44,12 +39,6 @@ namespace PGI.Views.Stocks
         {
             SetActiveSubNavButton(BtnCategories);
             LoadSubView("Views/Stocks/CategoriesView.xaml");
-        }
-
-        private void NavigateToDashboard()
-        {
-            SetActiveSubNavButton(BtnDashboard);
-            LoadSubView("Views/Stocks/StocksDashboardView.xaml");
         }
 
         private void SetActiveSubNavButton(Button button)

@@ -15,14 +15,41 @@ namespace PGI.Views.Finances
 
         private void LoadSampleData()
         {
-            var purchases = new List<Purchase>
+            try
             {
-                new Purchase { NumeroCommande = "A2025-0105", Date = "2025-01-25", Fournisseur = "Nordic Supplies", MontantTotal = "15 450 $", Statut = "Envoyée", StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F59E0B")) },
-                new Purchase { NumeroCommande = "A2025-0104", Date = "2025-01-22", Fournisseur = "Adventure Co.", MontantTotal = "22 890 $", Statut = "Reçue", StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981")) },
-                new Purchase { NumeroCommande = "A2025-0103", Date = "2025-01-20", Fournisseur = "Mountain Gear", MontantTotal = "8 320 $", Statut = "Fermée", StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#6B7280")) },
-            };
+                var commandes = PGI.Services.CommandeFournisseurService.GetAllCommandes();
+                var purchases = new List<Purchase>();
 
-            PurchasesDataGrid.ItemsSource = purchases;
+                foreach (var c in commandes)
+                {
+                    var purchase = new Purchase
+                    {
+                        NumeroCommande = c.NumeroCommande,
+                        Date = c.DateCommande.ToString("yyyy-MM-dd"),
+                        Fournisseur = c.NomFournisseur,
+                        MontantTotal = c.MontantTotal.ToString("C"),
+                        Statut = c.Statut
+                    };
+
+                    // Définir la couleur selon le statut
+                    if (purchase.Statut == "Reçue")
+                        purchase.StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981"));
+                    else if (purchase.Statut == "Envoyée" || purchase.Statut == "En attente")
+                        purchase.StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F59E0B"));
+                    else if (purchase.Statut == "Annulée" || purchase.Statut == "Fermée")
+                        purchase.StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#6B7280"));
+                    else
+                        purchase.StatutColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#64748B"));
+
+                    purchases.Add(purchase);
+                }
+
+                PurchasesDataGrid.ItemsSource = purchases;
+            }
+            catch (System.Exception ex)
+            {
+                 MessageBox.Show($"Erreur lors du chargement des achats : {ex.Message}", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void BtnAddPurchase_Click(object sender, RoutedEventArgs e)

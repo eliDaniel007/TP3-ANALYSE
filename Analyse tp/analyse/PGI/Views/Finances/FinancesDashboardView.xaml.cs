@@ -1,6 +1,6 @@
-using System.Collections.Generic;
-using System.Windows;
+using System;
 using System.Windows.Controls;
+using PGI.Services;
 
 namespace PGI.Views.Finances
 {
@@ -9,87 +9,42 @@ namespace PGI.Views.Finances
         public FinancesDashboardView()
         {
             InitializeComponent();
-            LoadSampleData();
+            LoadDashboardData();
         }
 
-        private void LoadSampleData()
+        private void LoadDashboardData()
         {
-            // Données d'exemple pour les factures impayées
-            var unpaidInvoices = new List<UnpaidInvoice>
+            try
             {
-                new UnpaidInvoice { NumeroFacture = "F2025-0987", Client = "Aventure Nordique Inc.", MontantDu = "4 250 $", JoursRetard = "45" },
-                new UnpaidInvoice { NumeroFacture = "F2025-0912", Client = "Plein Air Québec", MontantDu = "3 890 $", JoursRetard = "38" },
-                new UnpaidInvoice { NumeroFacture = "F2025-0856", Client = "Sports Extrêmes", MontantDu = "6 120 $", JoursRetard = "52" },
-            };
+                DateTime fin = DateTime.Now;
+                DateTime debut = fin.AddDays(-30);
 
-            // TODO: Assigner au DataGrid (nécessite un x:Name sur le DataGrid)
-        }
+                // A. Indicateurs Financiers (KPIs)
+                decimal ventes = DashboardService.GetVentesTotales(debut, fin);
+                decimal depenses = DashboardService.GetDepensesExploitation(debut, fin);
+                decimal coutVentes = DashboardService.GetCoutMarchandisesVendues(debut, fin);
+                
+                decimal margeBrute = ventes - coutVentes;
+                decimal profitNet = margeBrute - depenses;
 
-        private void BtnViewUnpaidInvoices_Click(object sender, RoutedEventArgs e)
-        {
-            // Naviguer vers la liste des ventes avec filtre "En retard"
-            var parent = FindParentFinancesMainView(this);
-            if (parent != null)
+                TxtVentes.Text = $"{ventes:C}";
+                TxtDepenses.Text = $"{depenses:C}";
+                TxtMarge.Text = $"{margeBrute:C}";
+                TxtProfitNet.Text = $"{profitNet:C}";
+
+                // B. Suivi de Trésorerie (Listes)
+                GridFacturesAttente.ItemsSource = DashboardService.GetFacturesEnAttente().DefaultView;
+                GridTransactions.ItemsSource = DashboardService.GetDernieresTransactions().DefaultView;
+
+                // C. Rapports (Taxes)
+                decimal taxes = DashboardService.GetTaxesAPayer();
+                TxtTaxes.Text = $"{taxes:C}";
+            }
+            catch (Exception ex)
             {
-                parent.BtnSales.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Primitives.ButtonBase.ClickEvent));
+                // En production, logger l'erreur. Ici on ne bloque pas l'UI.
+                Console.WriteLine($"Erreur Dashboard Finance: {ex.Message}");
             }
         }
-
-        private void BtnNewSale_Click(object sender, RoutedEventArgs e)
-        {
-            // Naviguer vers le formulaire de nouvelle vente
-            var parent = FindParentFinancesMainView(this);
-            if (parent != null)
-            {
-                parent.NavigateToSaleForm();
-            }
-        }
-
-        private void BtnNewPurchase_Click(object sender, RoutedEventArgs e)
-        {
-            // Naviguer vers le formulaire de nouvelle commande fournisseur
-            var parent = FindParentFinancesMainView(this);
-            if (parent != null)
-            {
-                parent.NavigateToPurchaseForm();
-            }
-        }
-
-        private void BtnRecordPayment_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show(
-                "Fonctionnalité 'Enregistrer un paiement' à implémenter.\n\n" +
-                "Cette fonction ouvrira un pop-up pour enregistrer un paiement sur une facture existante.",
-                "Information",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information
-            );
-        }
-
-        private void BtnTaxSettings_Click(object sender, RoutedEventArgs e)
-        {
-            var taxSettingsWindow = new TaxSettingsWindow();
-            taxSettingsWindow.ShowDialog();
-        }
-
-        private FinancesMainView? FindParentFinancesMainView(DependencyObject child)
-        {
-            DependencyObject parent = System.Windows.Media.VisualTreeHelper.GetParent(child);
-            while (parent != null && !(parent is FinancesMainView))
-            {
-                parent = System.Windows.Media.VisualTreeHelper.GetParent(parent);
-            }
-            return parent as FinancesMainView;
-        }
-    }
-
-    // Classe modèle pour les factures impayées
-    public class UnpaidInvoice
-    {
-        public string NumeroFacture { get; set; } = string.Empty;
-        public string Client { get; set; } = string.Empty;
-        public string MontantDu { get; set; } = string.Empty;
-        public string JoursRetard { get; set; } = string.Empty;
     }
 }
-

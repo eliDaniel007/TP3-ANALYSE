@@ -11,20 +11,8 @@ namespace PGI.Views.CRM
         public CRMMainView()
         {
             InitializeComponent();
-            // Charger le tableau de bord par défaut
-            NavigateToDashboard();
-        }
-
-        // Navigation vers le tableau de bord
-        private void BtnDashboard_Click(object sender, RoutedEventArgs e)
-        {
-            NavigateToDashboard();
-        }
-
-        private void NavigateToDashboard()
-        {
-            SetActiveSubNavButton(BtnDashboard);
-            LoadView("Views/CRM/CRMDashboardView.xaml");
+            // Charger la liste des clients par défaut
+            BtnClients_Click(null, null);
         }
 
         // Navigation vers Clients

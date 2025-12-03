@@ -52,13 +52,9 @@
                 BorderThickness="0,0,0,1"
                 Padding="0">
             <StackPanel Orientation="Horizontal">
-                <Button x:Name="BtnDashboard" 
-                        Content="📊 Tableau de bord" 
-                        Style="{StaticResource ActiveSubNavButtonStyle}"
-                        Click="BtnDashboard_Click"/>
                 <Button x:Name="BtnClients" 
                         Content="👤 Clients" 
-                        Style="{StaticResource SubNavButtonStyle}"
+                        Style="{StaticResource ActiveSubNavButtonStyle}"
                         Click="BtnClients_Click"/>
                 <Button x:Name="BtnCampaigns" 
                         Content="📢 Campagnes" 

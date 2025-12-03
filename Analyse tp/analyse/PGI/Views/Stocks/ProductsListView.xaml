@@ -49,6 +49,8 @@
                             Background="White"
                             Padding="10,8"
                             FontSize="13"
+                            HorizontalContentAlignment="Left"
+                            VerticalContentAlignment="Center"
                             SelectionChanged="CmbCategorie_SelectionChanged">
                         <ComboBoxItem Content="Toutes les catégories" IsSelected="True"/>
                     </ComboBox>
@@ -63,6 +65,8 @@
                             Background="White"
                             Padding="10,8"
                             FontSize="13"
+                            HorizontalContentAlignment="Left"
+                            VerticalContentAlignment="Center"
                             SelectionChanged="CmbFournisseur_SelectionChanged">
                         <ComboBoxItem Content="Tous les fournisseurs" IsSelected="True"/>
                     </ComboBox>
@@ -77,6 +81,8 @@
                             Background="White"
                             Padding="10,8"
                             FontSize="13"
+                            HorizontalContentAlignment="Left"
+                            VerticalContentAlignment="Center"
                             SelectionChanged="CmbStatut_SelectionChanged">
                         <ComboBoxItem Content="Tous les statuts" IsSelected="True"/>
                         <ComboBoxItem Content="Actif"/>

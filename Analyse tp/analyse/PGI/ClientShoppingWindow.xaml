@@ -166,12 +166,6 @@
                              Foreground="White" 
                              VerticalAlignment="Center"
                              Margin="0,0,20,0"/>
-                    <Button x:Name="BtnPanierHeader" 
-                          Content="🛒 Panier (0)" 
-                          Style="{StaticResource ModernButton}"
-                          Background="#10B981"
-                          Margin="0,0,10,0"
-                          Click="BtnPanierHeader_Click"/>
                     <Button x:Name="LogoutButton" 
                           Content="🚪 Déconnexion" 
                           Style="{StaticResource ModernButton}"
@@ -184,9 +178,13 @@
         <!-- Navigation Tabs -->
         <Border Background="White" Height="60" VerticalAlignment="Top" Margin="0,70,0,0">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Button x:Name="BtnTabAccueil" 
+                        Content="🏠 Accueil" 
+                        Style="{StaticResource ActiveTabButtonStyle}"
+                        Click="BtnTabAccueil_Click"/>
                 <Button x:Name="BtnTabCatalogue" 
                         Content="📦 Catalogue" 
-                        Style="{StaticResource ActiveTabButtonStyle}"
+                        Style="{StaticResource TabButtonStyle}"
                         Click="BtnTabCatalogue_Click"/>
                 <Button x:Name="BtnTabPanier" 
                         Content="🛒 Panier" 
@@ -196,18 +194,55 @@
                         Content="📋 Mes Commandes" 
                         Style="{StaticResource TabButtonStyle}"
                         Click="BtnTabCommandes_Click"/>
-                <Button x:Name="BtnTabHistorique" 
-                        Content="📊 Historique" 
-                        Style="{StaticResource TabButtonStyle}"
-                        Click="BtnTabHistorique_Click"/>
             </StackPanel>
         </Border>
         
         <!-- Contenu principal -->
         <ScrollViewer x:Name="MainScrollViewer" VerticalScrollBarVisibility="Auto" Margin="0,130,0,0">
             <Grid x:Name="MainContentGrid" Margin="40">
+                <!-- Onglet Accueil -->
+                <Grid x:Name="AccueilGrid" Visibility="Visible">
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Text="🏔️" 
+                                 FontSize="80" 
+                                 HorizontalAlignment="Center"
+                                 Margin="0,0,0,20"/>
+                        
+                        <TextBlock x:Name="TxtBienvenue" 
+                                 Text="Bienvenue !" 
+                                 FontSize="42" 
+                                 FontWeight="Bold" 
+                                 Foreground="#003049"
+                                 HorizontalAlignment="Center"
+                                 Margin="0,0,0,15"/>
+                        
+                        <TextBlock x:Name="TxtMessageAccueil" 
+                                 Text="Nous sommes ravis de vous accueillir sur Nordik Adventures !" 
+                                 FontSize="20" 
+                                 Foreground="#64748B"
+                                 HorizontalAlignment="Center"
+                                 TextAlignment="Center"
+                                 Margin="0,0,0,30"/>
+                        
+                        <TextBlock Text="Découvrez notre sélection d'équipements de plein air de qualité." 
+                                 FontSize="16" 
+                                 Foreground="#94A3B8"
+                                 HorizontalAlignment="Center"
+                                 TextAlignment="Center"
+                                 Margin="0,0,0,40"/>
+                        
+                        <Button x:Name="BtnCommencerAchat" 
+                              Content="🛒 Commencer mes achats" 
+                              Style="{StaticResource OrderButtonStyle}"
+                              Width="300"
+                              Height="50"
+                              FontSize="18"
+                              Click="BtnCommencerAchat_Click"/>
+                    </StackPanel>
+                </Grid>
+                
                 <!-- Onglet Catalogue -->
-                <Grid x:Name="CatalogueGrid" Visibility="Visible">
+                <Grid x:Name="CatalogueGrid" Visibility="Collapsed">
                     <StackPanel>
                         <TextBlock Text="Catalogue de Produits" 
                                  FontSize="28" 
@@ -561,7 +596,9 @@
                                     BorderThickness="0"
                                     GridLinesVisibility="None"
                                     RowBackground="White"
-                                    AlternatingRowBackground="#F8FAFC">
+                                    AlternatingRowBackground="#F8FAFC"
+                                    CanUserAddRows="False"
+                                    IsReadOnly="True">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="N° Commande" Binding="{Binding NumeroCommande}" Width="150"/>
                                     <DataGridTextColumn Header="Date" Binding="{Binding DateCommande, StringFormat='{}{0:dd/MM/yyyy}'}" Width="120"/>
@@ -593,38 +630,6 @@
                     </StackPanel>
                 </Grid>
                 
-                <!-- Onglet Historique -->
-                <Grid x:Name="HistoriqueGrid" Visibility="Collapsed">
-                    <StackPanel>
-                        <TextBlock Text="Historique des Achats" 
-                                 FontSize="28" 
-                                 FontWeight="Bold" 
-                                 Foreground="#003049"
-                                 Margin="0,0,0,20"/>
-                        
-                        <Border Background="White" 
-                              CornerRadius="12" 
-                              Padding="20"
-                              BorderBrush="#E2E8F0"
-                              BorderThickness="1">
-                            <DataGrid x:Name="HistoriqueDataGrid" 
-                                    AutoGenerateColumns="False"
-                                    HeadersVisibility="Column"
-                                    BorderThickness="0"
-                                    GridLinesVisibility="None"
-                                    RowBackground="White"
-                                    AlternatingRowBackground="#F8FAFC">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="N° Commande" Binding="{Binding NumeroCommande}" Width="150"/>
-                                    <DataGridTextColumn Header="Date" Binding="{Binding DateCommande, StringFormat='{}{0:dd/MM/yyyy}'}" Width="120"/>
-                                    <DataGridTextColumn Header="Statut" Binding="{Binding Statut}" Width="120"/>
-                                    <DataGridTextColumn Header="Montant" Binding="{Binding MontantTotal, StringFormat='{}{0:C}'}" Width="120"/>
-                                    <DataGridTextColumn Header="Articles" Binding="{Binding NombreArticles}" Width="100"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </Border>
-                    </StackPanel>
-                </Grid>
             </Grid>
         </ScrollViewer>
     </Grid>
