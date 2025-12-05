@@ -66,7 +66,30 @@
                          FontSize="14"
                          Text="Rechercher par N° Commande ou Fournisseur..."
                          Foreground="#94A3B8"
-                         Margin="0,0,15,0"/>
+                         Margin="0,0,15,0">
+                    <TextBox.Style>
+                        <Style TargetType="TextBox">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="TextBox">
+                                        <Border Background="{TemplateBinding Background}" 
+                                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                CornerRadius="8">
+                                            <ScrollViewer x:Name="PART_ContentHost" 
+                                                        Margin="{TemplateBinding Padding}"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Style.Triggers>
+                                <Trigger Property="IsFocused" Value="True">
+                                    <Setter Property="BorderBrush" Value="#669BBC"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
 
                 <ComboBox x:Name="CmbStatusFilter" 
                           Grid.Column="1"
@@ -97,7 +120,8 @@
                     CanUserDeleteRows="False"
                     IsReadOnly="True"
                     SelectionMode="Single"
-                    FontSize="13">
+                    FontSize="13"
+                    MouseDoubleClick="PurchasesDataGrid_MouseDoubleClick">
                 <DataGrid.ColumnHeaderStyle>
                     <Style TargetType="DataGridColumnHeader">
                         <Setter Property="Background" Value="#F8FAFC"/>
@@ -129,27 +153,69 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="Actions" Width="150">
+                    <DataGridTemplateColumn Header="Actions" Width="200">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <Button Content="✏️" 
+                                    <Button Content="👁️" 
+                                            Width="30" Height="30" 
+                                            Background="Transparent" 
+                                            BorderThickness="0"
+                                            Cursor="Hand"
+                                            ToolTip="Voir les détails"
+                                            Margin="2"
+                                            Click="BtnDetails_Click"/>
+                                    <Button x:Name="BtnEdit" Content="✏️" 
                                             Width="30" Height="30" 
                                             Background="Transparent" 
                                             BorderThickness="0"
                                             Cursor="Hand"
                                             ToolTip="Modifier"
                                             Margin="2"
-                                            Click="BtnEdit_Click"/>
-                                    <Button Content="📦" 
+                                            Click="BtnEdit_Click">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Statut}" Value="Reçue">
+                                                        <Setter Property="IsEnabled" Value="False"/>
+                                                        <Setter Property="Opacity" Value="0.4"/>
+                                                        <Setter Property="ToolTip" Value="Impossible de modifier une commande reçue"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Statut}" Value="Fermée">
+                                                        <Setter Property="IsEnabled" Value="False"/>
+                                                        <Setter Property="Opacity" Value="0.4"/>
+                                                        <Setter Property="ToolTip" Value="Impossible de modifier une commande fermée"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <Button x:Name="BtnReceive" Content="📦" 
                                             Width="30" Height="30" 
                                             Background="Transparent" 
                                             BorderThickness="0"
                                             Cursor="Hand"
                                             ToolTip="Réceptionner"
                                             Margin="2"
-                                            Click="BtnReceive_Click"/>
-                                    <Button Content="✅" 
+                                            Click="BtnReceive_Click">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Statut}" Value="Reçue">
+                                                        <Setter Property="IsEnabled" Value="False"/>
+                                                        <Setter Property="Opacity" Value="0.4"/>
+                                                        <Setter Property="ToolTip" Value="Commande déjà réceptionnée"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Statut}" Value="Fermée">
+                                                        <Setter Property="IsEnabled" Value="False"/>
+                                                        <Setter Property="Opacity" Value="0.4"/>
+                                                        <Setter Property="ToolTip" Value="Impossible de réceptionner une commande fermée"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <Button x:Name="BtnClose" Content="✅" 
                                             Width="30" Height="30" 
                                             Background="Transparent" 
                                             BorderThickness="0"
@@ -157,7 +223,25 @@
                                             ToolTip="Fermer la commande"
                                             Foreground="#10B981"
                                             Margin="2"
-                                            Click="BtnClose_Click"/>
+                                            Click="BtnClose_Click">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="IsEnabled" Value="False"/>
+                                                <Setter Property="Opacity" Value="0.4"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Statut}" Value="Reçue">
+                                                        <Setter Property="IsEnabled" Value="True"/>
+                                                        <Setter Property="Opacity" Value="1"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Statut}" Value="Fermée">
+                                                        <Setter Property="IsEnabled" Value="False"/>
+                                                        <Setter Property="Opacity" Value="0.4"/>
+                                                        <Setter Property="ToolTip" Value="Commande déjà fermée"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
                                 </StackPanel>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>

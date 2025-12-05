@@ -103,19 +103,75 @@ namespace PGI.Views.Dashboard
                 var button = sender as Button;
                 if (button?.DataContext is System.Data.DataRowView row)
                 {
+                    // Validation des données
+                    if (row["id"] == DBNull.Value || row["fournisseur_id"] == DBNull.Value)
+                    {
+                        MessageBox.Show("Données produit incomplètes (ID ou Fournisseur manquant).", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    int produitId = Convert.ToInt32(row["id"]);
                     string sku = row["sku"].ToString();
                     string nom = row["nom"].ToString();
                     
-                    MessageBox.Show(
-                        $"Demande de réapprovisionnement envoyée pour :\n{nom} ({sku})\n\nLe responsable des achats a été notifié.",
-                        "Réapprovisionnement initié",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Information);
+                    decimal cout = 0;
+                    if (row["cout"] != DBNull.Value)
+                        cout = Convert.ToDecimal(row["cout"]);
+                        
+                    int fournisseurId = Convert.ToInt32(row["fournisseur_id"]);
+                    
+                    int seuil = 0;
+                    if (row["seuil_reapprovisionnement"] != DBNull.Value)
+                        seuil = Convert.ToInt32(row["seuil_reapprovisionnement"]);
+                    
+                    // Quantité à commander : Remonter au seuil + marge
+                    int quantiteACommander = Math.Max(20, seuil * 2);
+
+                    // Créer l'objet commande
+                    var commande = new Models.CommandeFournisseur
+                    {
+                        NumeroCommande = CommandeFournisseurService.GenererNumeroCommande(),
+                        DateCommande = DateTime.Now,
+                        FournisseurId = fournisseurId,
+                        NoteInterne = "Réapprovisionnement automatique depuis le tableau de bord"
+                    };
+
+                    // Créer la ligne de commande
+                    var ligne = new Models.LigneCommandeFournisseur
+                    {
+                        ProduitId = produitId,
+                        SKU = sku,
+                        Description = nom,
+                        QuantiteCommandee = quantiteACommander,
+                        PrixUnitaire = cout
+                    };
+
+                    // Sauvegarder
+                    int cmdId = CommandeFournisseurService.CreerCommande(commande, new List<Models.LigneCommandeFournisseur> { ligne });
+                    
+                    if (cmdId > 0)
+                    {
+                        MessageBox.Show(
+                            $"✅ Commande {commande.NumeroCommande} créée avec succès !\n\n" +
+                            $"Produit : {nom}\n" +
+                            $"Quantité : {quantiteACommander}\n" +
+                            $"Statut : Envoyée",
+                            "Réapprovisionnement effectué",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
+                            
+                        // Rafraîchir les alertes
+                        LoadDashboardData();
+                    }
+                    else
+                    {
+                        MessageBox.Show("La commande n'a pas pu être créée.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
             }
             catch (Exception ex)
             {
-                 MessageBox.Show($"Erreur : {ex.Message}", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                 MessageBox.Show($"Erreur détaillée : {ex.Message}\n\nStack: {ex.StackTrace}", "Erreur Critique", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

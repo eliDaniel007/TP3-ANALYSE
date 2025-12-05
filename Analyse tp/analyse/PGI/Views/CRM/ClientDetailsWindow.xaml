@@ -142,9 +142,91 @@
                     </Border>
                 </TabItem>
 
-                <TabItem Header="💬 Interactions">
-                    <Border Padding="15">
-                        <DataGrid x:Name="InteractionsDataGrid" 
+                <TabItem Header="📋 Historique des Actions (Journal)">
+                    <Grid Margin="15">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- En-tête explicatif -->
+                        <TextBlock Grid.Row="0" 
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,15"
+                                   FontSize="13"
+                                   Foreground="#64748B">
+                            <Run Text="Ce journal enregistre automatiquement : "/>
+                            <Run Text="visites du site, commandes passées, courriels de bienvenue envoyés." FontStyle="Italic"/>
+                            <LineBreak/>
+                            <Run Text="Vous pouvez également ajouter manuellement un résumé d'appel ou un courriel."/>
+                        </TextBlock>
+
+                        <!-- Zone d'ajout manuelle -->
+                        <Border Grid.Row="1" Background="#F1F5F9" CornerRadius="8" Padding="15" Margin="0,0,0,15">
+                            <StackPanel>
+                                <TextBlock Text="➕ Ajouter une interaction manuelle" 
+                                           FontWeight="SemiBold" 
+                                           FontSize="14"
+                                           Foreground="#003049"
+                                           Margin="0,0,0,10"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="120"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBox x:Name="TxtInteractionSujet" Grid.Row="0" Grid.Column="0" Margin="0,0,10,10" 
+                                             Padding="5" 
+                                             Text="Sujet (ex: Appel sortant, Courriel envoyé)"
+                                             Foreground="#94A3B8"
+                                             GotFocus="TxtInteractionSujet_GotFocus"
+                                             LostFocus="TxtInteractionSujet_LostFocus"/>
+                                    
+                                    <TextBox x:Name="TxtInteractionNote" Grid.Row="1" Grid.Column="0" Margin="0,0,10,0" 
+                                             Padding="5" Height="80" TextWrapping="Wrap" AcceptsReturn="True" 
+                                             Text="Résumé de l'échange ou contenu du courriel..."
+                                             Foreground="#94A3B8"
+                                             GotFocus="TxtInteractionNote_GotFocus"
+                                             LostFocus="TxtInteractionNote_LostFocus"/>
+
+                                    <Button Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" 
+                                            Content="Ajouter" 
+                                            Background="#669BBC" Foreground="White"
+                                            BorderThickness="0"
+                                            Cursor="Hand" FontWeight="SemiBold"
+                                            Click="BtnAddInteraction_Click">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Border Background="{TemplateBinding Background}" 
+                                                                    CornerRadius="6" 
+                                                                    Padding="10,8">
+                                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                            </Border>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Background" Value="#003049"/>
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Liste du journal -->
+                        <DataGrid Grid.Row="2" x:Name="InteractionsDataGrid" 
                                   AutoGenerateColumns="False" 
                                   RowHeight="45"
                                   HeadersVisibility="Column"
@@ -164,18 +246,71 @@
                                 </Style>
                             </DataGrid.ColumnHeaderStyle>
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Date" Binding="{Binding DateFormate}" Width="120"/>
-                                <DataGridTextColumn Header="Type" Binding="{Binding TypeInteraction}" Width="100"/>
-                                <DataGridTextColumn Header="Sujet" Binding="{Binding Sujet}" Width="200"/>
-                                <DataGridTextColumn Header="Employé" Binding="{Binding NomEmploye}" Width="*"/>
+                                <DataGridTextColumn Header="Date/Heure" Binding="{Binding DateFormate}" Width="140"/>
+                                <DataGridTemplateColumn Header="Type" Width="140">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding TypeIcon}" FontSize="14" Margin="0,0,5,0"/>
+                                                <TextBlock Text="{Binding TypeInteraction}" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Header="Sujet/Action" Binding="{Binding Sujet}" Width="200"/>
+                                <DataGridTextColumn Header="Détails" Binding="{Binding Description}" Width="*"/>
+                                <DataGridTextColumn Header="Source" Binding="{Binding NomEmploye}" Width="120">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsAutomatique}" Value="True">
+                                                    <Setter Property="Foreground" Value="#10B981"/>
+                                                    <Setter Property="FontStyle" Value="Italic"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
                             </DataGrid.Columns>
                         </DataGrid>
-                    </Border>
+                    </Grid>
                 </TabItem>
 
-                <TabItem Header="⭐ Évaluations">
-                    <Border Padding="15">
-                        <DataGrid x:Name="EvaluationsDataGrid" 
+                <TabItem Header="⭐ Satisfaction Client">
+                    <Grid Margin="15">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- KPI Satisfaction -->
+                        <Border Grid.Row="0" Background="#F1F5F9" CornerRadius="10" Padding="20" Margin="0,0,0,15">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Note moyenne" FontSize="12" Foreground="#64748B" Margin="0,0,0,5"/>
+                                    <TextBlock x:Name="TxtNoteMoyenne" Text="0 / 5" FontSize="28" FontWeight="Bold" Foreground="#F59E0B"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="Nombre d'évaluations" FontSize="12" Foreground="#64748B" Margin="0,0,0,5"/>
+                                    <TextBlock x:Name="TxtNbEvaluations" Text="0" FontSize="28" FontWeight="Bold" Foreground="#003049"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="Dernière évaluation" FontSize="12" Foreground="#64748B" Margin="0,0,0,5"/>
+                                    <TextBlock x:Name="TxtDerniereEvaluation" Text="-" FontSize="16" FontWeight="SemiBold" Foreground="#003049"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- Liste des évaluations -->
+                        <DataGrid Grid.Row="1" x:Name="SatisfactionDataGrid" 
                                   AutoGenerateColumns="False" 
                                   RowHeight="45"
                                   HeadersVisibility="Column"
@@ -196,12 +331,19 @@
                             </DataGrid.ColumnHeaderStyle>
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Date" Binding="{Binding DateFormate}" Width="120"/>
-                                <DataGridTextColumn Header="Note" Binding="{Binding NoteFormate}" Width="100"/>
+                                <DataGridTextColumn Header="Note" Binding="{Binding NoteFormate}" Width="100">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                            <Setter Property="Foreground" Value="#F59E0B"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
                                 <DataGridTextColumn Header="Facture" Binding="{Binding NumeroFacture}" Width="150"/>
                                 <DataGridTextColumn Header="Commentaire" Binding="{Binding Commentaire}" Width="*"/>
                             </DataGrid.Columns>
                         </DataGrid>
-                    </Border>
+                    </Grid>
                 </TabItem>
 
                 <TabItem Header="⚠️ Alertes">

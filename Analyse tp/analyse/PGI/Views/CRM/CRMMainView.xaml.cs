@@ -29,6 +29,13 @@ namespace PGI.Views.CRM
             LoadView("Views/CRM/CampaignsListView.xaml");
         }
 
+        // Navigation vers Satisfaction
+        private void BtnSatisfaction_Click(object sender, RoutedEventArgs e)
+        {
+            SetActiveSubNavButton(BtnSatisfaction);
+            LoadView("Views/CRM/SatisfactionView.xaml");
+        }
+
         // Navigation vers le formulaire client
         public void NavigateToClientForm()
         {
@@ -41,6 +48,21 @@ namespace PGI.Views.CRM
         {
             SetActiveSubNavButton(BtnCampaigns);
             LoadView("Views/CRM/CampaignFormView.xaml");
+        }
+
+        // Navigation vers le formulaire campagne avec ID (pour édition)
+        public void LoadCampaignForm(int campagneId)
+        {
+            SetActiveSubNavButton(BtnCampaigns);
+            var formView = new CampaignFormView(campagneId);
+            SubContentArea.Content = formView;
+        }
+
+        // Navigation vers la liste des campagnes
+        public void NavigateToCampaigns()
+        {
+            SetActiveSubNavButton(BtnCampaigns);
+            LoadView("Views/CRM/CampaignsListView.xaml");
         }
 
         // Méthodes utilitaires

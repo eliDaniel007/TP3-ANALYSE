@@ -125,6 +125,174 @@ namespace PGI.Services
         }
 
         /// <summary>
+        /// Modifier une commande fournisseur existante
+        /// </summary>
+        public static bool ModifierCommande(int commandeId, CommandeFournisseur commande, List<LigneCommandeFournisseur> lignes)
+        {
+            if (lignes == null || lignes.Count == 0)
+                throw new Exception("La commande doit contenir au moins une ligne");
+
+            // Vérifier que la commande existe et peut être modifiée
+            var commandeExistante = GetCommandeById(commandeId);
+            if (commandeExistante == null)
+                throw new Exception("Commande introuvable");
+
+            if (commandeExistante.Statut == "Reçue" || commandeExistante.Statut == "Fermée" || commandeExistante.Statut == "Annulée")
+                throw new Exception($"Impossible de modifier une commande avec le statut '{commandeExistante.Statut}'");
+
+            using (var conn = DatabaseHelper.GetConnection())
+            {
+                conn.Open();
+                using (var transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        // 1. Calculer les nouveaux totaux
+                        decimal sousTotal = 0;
+                        foreach (var ligne in lignes)
+                        {
+                            sousTotal += ligne.QuantiteCommandee * ligne.PrixUnitaire;
+                        }
+                        
+                        var (tps, tvq, total) = TaxesService.CalculerTaxes(sousTotal);
+                        
+                        // 2. Mettre à jour la commande
+                        string updateCommande = @"
+                            UPDATE commandes_fournisseurs 
+                            SET fournisseur_id = @fournisseurId,
+                                sous_total = @sousTotal, 
+                                montant_tps = @tps, 
+                                montant_tvq = @tvq, 
+                                montant_total = @total,
+                                note_interne = @note
+                            WHERE id = @id";
+                        
+                        using (var cmd = new MySqlCommand(updateCommande, conn, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@fournisseurId", commande.FournisseurId);
+                            cmd.Parameters.AddWithValue("@sousTotal", sousTotal);
+                            cmd.Parameters.AddWithValue("@tps", tps);
+                            cmd.Parameters.AddWithValue("@tvq", tvq);
+                            cmd.Parameters.AddWithValue("@total", total);
+                            cmd.Parameters.AddWithValue("@note", commande.NoteInterne ?? (object)DBNull.Value);
+                            cmd.Parameters.AddWithValue("@id", commandeId);
+                            cmd.ExecuteNonQuery();
+                        }
+                        
+                        // 3. Supprimer les anciennes lignes
+                        string deleteLignes = "DELETE FROM lignes_commandes_fournisseurs WHERE commande_id = @commandeId";
+                        using (var cmd = new MySqlCommand(deleteLignes, conn, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@commandeId", commandeId);
+                            cmd.ExecuteNonQuery();
+                        }
+                        
+                        // 4. Insérer les nouvelles lignes en conservant les quantités déjà reçues
+                        // Créer un dictionnaire pour retrouver rapidement les quantités reçues par produit
+                        var quantitesRecuesParProduit = commandeExistante.Lignes
+                            .GroupBy(l => l.ProduitId)
+                            .ToDictionary(g => g.Key, g => g.Sum(l => l.QuantiteRecue));
+                        
+                        foreach (var ligne in lignes)
+                        {
+                            string insertLigne = @"
+                                INSERT INTO lignes_commandes_fournisseurs 
+                                (commande_id, produit_id, sku, description, quantite_commandee, quantite_recue, prix_unitaire, montant_ligne)
+                                VALUES 
+                                (@commandeId, @produitId, @sku, @description, @qteCommande, @qteRecue, @prix, @montant)";
+                            
+                            using (var cmd = new MySqlCommand(insertLigne, conn, transaction))
+                            {
+                                // Conserver la quantité déjà reçue pour ce produit
+                                int qteRecue = quantitesRecuesParProduit.ContainsKey(ligne.ProduitId) 
+                                    ? quantitesRecuesParProduit[ligne.ProduitId] 
+                                    : 0;
+                                
+                                // Ne pas permettre de réduire la quantité commandée en dessous de la quantité déjà reçue
+                                if (ligne.QuantiteCommandee < qteRecue)
+                                {
+                                    throw new Exception($"La quantité commandée ({ligne.QuantiteCommandee}) ne peut pas être inférieure à la quantité déjà reçue ({qteRecue}) pour le produit {ligne.Description}");
+                                }
+                                
+                                cmd.Parameters.AddWithValue("@commandeId", commandeId);
+                                cmd.Parameters.AddWithValue("@produitId", ligne.ProduitId);
+                                cmd.Parameters.AddWithValue("@sku", ligne.SKU);
+                                cmd.Parameters.AddWithValue("@description", ligne.Description);
+                                cmd.Parameters.AddWithValue("@qteCommande", ligne.QuantiteCommandee);
+                                cmd.Parameters.AddWithValue("@qteRecue", qteRecue);
+                                cmd.Parameters.AddWithValue("@prix", ligne.PrixUnitaire);
+                                cmd.Parameters.AddWithValue("@montant", ligne.QuantiteCommandee * ligne.PrixUnitaire);
+                                
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+                        
+                        transaction.Commit();
+                        return true;
+                    }
+                    catch (Exception)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Recevoir totalement une commande
+        /// </summary>
+        public static bool RecevoirCommandeTotalement(int commandeId, int? employeId)
+        {
+            var commande = GetCommandeById(commandeId);
+            if (commande == null) return false;
+
+            var quantitesRecues = new Dictionary<int, int>();
+            foreach (var ligne in commande.Lignes)
+            {
+                int resteARecevoir = ligne.QuantiteCommandee - ligne.QuantiteRecue;
+                if (resteARecevoir > 0)
+                {
+                    quantitesRecues.Add(ligne.Id, resteARecevoir);
+                }
+            }
+
+            if (quantitesRecues.Count == 0) return true; // Déjà reçue
+
+            return RecevoirCommande(commandeId, quantitesRecues, employeId);
+        }
+
+        /// <summary>
+        /// Obtenir une commande par son numéro
+        /// </summary>
+        public static CommandeFournisseur? GetCommandeByNumero(string numero)
+        {
+            CommandeFournisseur? commande = null;
+            try
+            {
+                using (var conn = DatabaseHelper.GetConnection())
+                {
+                    conn.Open();
+                    string query = "SELECT id FROM commandes_fournisseurs WHERE numero_commande = @numero";
+                    using (var cmd = new MySqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@numero", numero);
+                        var result = cmd.ExecuteScalar();
+                        if (result != null && result != DBNull.Value)
+                        {
+                            return GetCommandeById(Convert.ToInt32(result));
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erreur recherche commande: {ex.Message}");
+            }
+            return commande;
+        }
+
+        /// <summary>
         /// Recevoir une commande (complète ou partielle) et mettre à jour le stock
         /// </summary>
         public static bool RecevoirCommande(int commandeId, Dictionary<int, int> quantitesRecues, int? employeId)
@@ -357,6 +525,38 @@ namespace PGI.Services
             }
 
             return commande;
+        }
+
+        /// <summary>
+        /// Fermer une commande (marquer comme terminée)
+        /// </summary>
+        public static bool FermerCommande(int commandeId)
+        {
+            var commande = GetCommandeById(commandeId);
+            if (commande == null)
+                throw new Exception("Commande introuvable");
+
+            if (commande.Statut != "Reçue")
+                throw new Exception("Seules les commandes reçues peuvent être fermées");
+
+            try
+            {
+                using (var conn = DatabaseHelper.GetConnection())
+                {
+                    conn.Open();
+                    string query = "UPDATE commandes_fournisseurs SET statut = 'Fermée' WHERE id = @id";
+                    
+                    using (var cmd = new MySqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@id", commandeId);
+                        return cmd.ExecuteNonQuery() > 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erreur lors de la fermeture de la commande: {ex.Message}", ex);
+            }
         }
 
         /// <summary>

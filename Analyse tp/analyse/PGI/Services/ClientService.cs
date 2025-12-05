@@ -9,6 +9,42 @@ namespace PGI.Services
     public class ClientService
     {
         /// <summary>
+        /// Obtenir tous les clients
+        /// </summary>
+        public static List<Client> GetAllClients()
+        {
+            var clients = new List<Client>();
+            try
+            {
+                string query = @"
+                    SELECT id, type, nom, courriel_contact, telephone, statut, date_creation
+                    FROM clients
+                    ORDER BY date_creation DESC";
+
+                var dt = DatabaseHelper.ExecuteQuery(query);
+
+                foreach (DataRow row in dt.Rows)
+                {
+                    clients.Add(new Client
+                    {
+                        Id = Convert.ToInt32(row["id"]),
+                        Type = row["type"].ToString() ?? string.Empty,
+                        Nom = row["nom"].ToString() ?? string.Empty,
+                        CourrielContact = row["courriel_contact"].ToString() ?? string.Empty,
+                        Telephone = row["telephone"] != DBNull.Value ? row["telephone"].ToString() : string.Empty,
+                        Statut = row["statut"].ToString() ?? "Actif",
+                        DateCreation = Convert.ToDateTime(row["date_creation"])
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erreur récupération clients: {ex.Message}");
+            }
+            return clients;
+        }
+
+        /// <summary>
         /// Authentifier un client avec email et mot de passe
         /// </summary>
         public static (bool success, string nom, int clientId) Authenticate(string email, string password)

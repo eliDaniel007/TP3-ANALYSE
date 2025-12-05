@@ -8,13 +8,13 @@
                 <!-- En-tête -->
                 <Grid Margin="0,0,0,25">
                     <StackPanel>
-                        <TextBlock Text="📦 Nouvelle Commande Fournisseur" 
+                        <TextBlock x:Name="TxtFormTitle" Text="📦 Nouvelle Commande Fournisseur" 
                                  FontSize="24" 
                                  FontWeight="SemiBold" 
                                  Foreground="#003049"
                                  Margin="0,0,0,10"/>
-                        <Border Background="#F59E0B" CornerRadius="12" Padding="10,5" HorizontalAlignment="Left">
-                            <TextBlock Text="BROUILLON" FontSize="12" FontWeight="SemiBold" Foreground="White"/>
+                        <Border x:Name="BorderStatut" Background="#F59E0B" CornerRadius="12" Padding="10,5" HorizontalAlignment="Left">
+                            <TextBlock x:Name="TxtStatut" Text="BROUILLON" FontSize="12" FontWeight="SemiBold" Foreground="White"/>
                         </Border>
                     </StackPanel>
                     
@@ -115,11 +115,17 @@
                                   BorderBrush="#E2E8F0"
                                   BorderThickness="2"
                                   Padding="12,10"
-                                  FontSize="14">
-                            <ComboBoxItem Content="Sélectionner un fournisseur..." IsSelected="True"/>
-                            <ComboBoxItem Content="Nordic Supplies"/>
-                            <ComboBoxItem Content="Adventure Co."/>
-                            <ComboBoxItem Content="Mountain Gear"/>
+                                  FontSize="14"
+                                  SelectionChanged="CmbFournisseur_SelectionChanged">
+                            <ComboBox.Style>
+                                <Style TargetType="ComboBox">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsFocused" Value="True">
+                                            <Setter Property="BorderBrush" Value="#669BBC"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ComboBox.Style>
                         </ComboBox>
                     </StackPanel>
                 </Border>
@@ -181,6 +187,7 @@
                             </DataGrid.ColumnHeaderStyle>
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Produit" Binding="{Binding Produit}" Width="*"/>
+                                <DataGridTextColumn Header="SKU" Binding="{Binding SKU}" Width="120"/>
                                 <DataGridTextColumn Header="Coût d'achat" Binding="{Binding CoutAchat}" Width="120"/>
                                 <DataGridTextColumn Header="Quantité" Binding="{Binding Quantite}" Width="100"/>
                                 <DataGridTextColumn Header="Total" Binding="{Binding Total}" Width="120"/>

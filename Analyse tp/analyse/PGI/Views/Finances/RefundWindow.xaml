@@ -1,13 +1,16 @@
 <Window x:Class="PGI.Views.Finances.RefundWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         Title="Rembourser un paiement"
-        Height="450" Width="550"
+        Height="650" Width="700"
         WindowStartupLocation="CenterScreen"
-        ResizeMode="NoResize"
+        ResizeMode="CanResize"
+        MinHeight="500" MinWidth="600"
         Background="#F8FAFC">
-    <Border Padding="30">
-        <StackPanel>
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <Border Padding="30">
+            <StackPanel>
             <TextBlock Text="💸 Rembourser un paiement" 
                      FontSize="24" 
                      FontWeight="SemiBold" 
@@ -24,19 +27,51 @@
                              Margin="0,0,0,15"/>
                     
                     <Grid Margin="0,0,0,10">
-                        <TextBlock Text="N° Facture :" FontSize="14" Foreground="#64748B"/>
-                        <TextBlock x:Name="TxtNumeroFacture" Text="F2025-1045" FontSize="14" FontWeight="SemiBold" Foreground="#003049" HorizontalAlignment="Right"/>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="N° Facture :" FontSize="14" Foreground="#64748B"/>
+                        <TextBlock x:Name="TxtNumeroFacture" Grid.Column="1" Text="F2025-1045" FontSize="14" FontWeight="SemiBold" Foreground="#003049" HorizontalAlignment="Right"/>
                     </Grid>
                     
                     <Grid Margin="0,0,0,10">
-                        <TextBlock Text="Client :" FontSize="14" Foreground="#64748B"/>
-                        <TextBlock x:Name="TxtClient" Text="Aventure Nordique Inc." FontSize="14" Foreground="#003049" HorizontalAlignment="Right"/>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Client :" FontSize="14" Foreground="#64748B"/>
+                        <TextBlock x:Name="TxtClient" Grid.Column="1" Text="Aventure Nordique Inc." FontSize="14" Foreground="#003049" HorizontalAlignment="Right" TextWrapping="Wrap"/>
+                    </Grid>
+                    
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Montant total facture :" FontSize="14" Foreground="#64748B"/>
+                        <TextBlock x:Name="TxtMontantTotal" Grid.Column="1" Text="0,00 $" FontSize="14" FontWeight="SemiBold" Foreground="#003049" HorizontalAlignment="Right"/>
                     </Grid>
                     
                     <Border Background="#F0FDF4" CornerRadius="8" Padding="12" Margin="0,10,0,0">
                         <Grid>
-                            <TextBlock Text="Montant payé :" FontSize="14" FontWeight="Bold" Foreground="#10B981"/>
-                            <TextBlock x:Name="TxtMontantPaye" Text="4 250,00 $" FontSize="16" FontWeight="Bold" Foreground="#10B981" HorizontalAlignment="Right"/>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Montant total payé :" FontSize="14" FontWeight="Bold" Foreground="#10B981"/>
+                            <TextBlock x:Name="TxtMontantPaye" Grid.Column="1" Text="0,00 $" FontSize="16" FontWeight="Bold" Foreground="#10B981" HorizontalAlignment="Right"/>
+                        </Grid>
+                    </Border>
+                    
+                    <Border Background="#FEF3C7" CornerRadius="8" Padding="12" Margin="0,10,0,0" Visibility="Collapsed" x:Name="BorderMontantRembourse">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Déjà remboursé :" FontSize="14" FontWeight="Bold" Foreground="#F59E0B"/>
+                            <TextBlock x:Name="TxtMontantRembourse" Grid.Column="1" Text="0,00 $" FontSize="14" FontWeight="Bold" Foreground="#F59E0B" HorizontalAlignment="Right"/>
                         </Grid>
                     </Border>
                 </StackPanel>
@@ -51,14 +86,33 @@
                              Foreground="#003049"
                              Margin="0,0,0,15"/>
                     
-                    <TextBlock Text="Montant à rembourser" FontSize="13" Foreground="#64748B" Margin="0,0,0,8"/>
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="Montant à rembourser" FontSize="13" Foreground="#64748B" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="TxtMontantMax" Grid.Column="1" Text="" FontSize="11" Foreground="#94A3B8" FontStyle="Italic" Margin="10,0,0,0"/>
+                    </Grid>
                     <TextBox x:Name="TxtMontantRemboursement"
                              Background="White"
                              BorderBrush="#E2E8F0"
                              BorderThickness="2"
                              Padding="12,10"
                              FontSize="16"
-                             Margin="0,0,0,15"/>
+                             FontWeight="SemiBold"
+                             TextChanged="TxtMontantRemboursement_TextChanged"
+                             Margin="0,0,0,15">
+                        <TextBox.Style>
+                            <Style TargetType="TextBox">
+                                <Style.Triggers>
+                                    <Trigger Property="IsFocused" Value="True">
+                                        <Setter Property="BorderBrush" Value="#669BBC"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
                     
                     <TextBlock Text="Motif du remboursement" FontSize="13" Foreground="#64748B" Margin="0,0,0,8"/>
                     <TextBox x:Name="TxtMotif"
@@ -73,13 +127,19 @@
                              Margin="0,0,0,15"/>
                     
                     <TextBlock Text="Date du remboursement" FontSize="13" Foreground="#64748B" Margin="0,0,0,8"/>
-                    <TextBox x:Name="TxtDateRemboursement"
-                             Text="2025-01-28"
-                             Background="White"
-                             BorderBrush="#E2E8F0"
-                             BorderThickness="2"
-                             Padding="12,10"
-                             FontSize="14"/>
+                    <DatePicker x:Name="DpDateRemboursement"
+                                Background="White"
+                                BorderBrush="#E2E8F0"
+                                BorderThickness="2"
+                                Padding="12,10"
+                                FontSize="14"
+                                SelectedDate="{x:Static sys:DateTime.Now}">
+                        <DatePicker.Resources>
+                            <Style TargetType="DatePickerTextBox">
+                                <Setter Property="Padding" Value="12,10"/>
+                            </Style>
+                        </DatePicker.Resources>
+                    </DatePicker>
                 </StackPanel>
             </Border>
             
@@ -151,5 +211,6 @@
             </StackPanel>
         </StackPanel>
     </Border>
+    </ScrollViewer>
 </Window>
 

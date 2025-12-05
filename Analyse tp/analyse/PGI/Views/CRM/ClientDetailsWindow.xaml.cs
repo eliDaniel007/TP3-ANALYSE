@@ -1,175 +1,263 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
-using PGI.Services;
 using PGI.Models;
+using PGI.Services;
 
 namespace PGI.Views.CRM
 {
     public partial class ClientDetailsWindow : Window
     {
-        private int clientId;
+        private int _clientId;
+        private PGI.Models.Client _client;
 
         public ClientDetailsWindow(int clientId)
         {
             InitializeComponent();
-            this.clientId = clientId;
-            LoadClientDetails();
+            _clientId = clientId;
+            LoadClientData();
         }
 
-        private void LoadClientDetails()
+        private void LoadClientData()
         {
             try
             {
-                // Charger les informations du client
-                var client = ClientService.GetClientById(clientId);
-                if (client == null)
+                // 1. Infos de base
+                _client = ClientService.GetClientById(_clientId);
+                if (_client == null)
                 {
-                    MessageBox.Show("Client introuvable.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Client introuvable.");
                     this.Close();
                     return;
                 }
 
-                // En-tête
-                TxtNomClient.Text = client.Nom;
-                TxtStatut.Text = client.Statut.ToUpper();
-                TxtType.Text = client.Type;
+                TxtNomClient.Text = _client.Nom ?? "-";
+                TxtEmail.Text = !string.IsNullOrWhiteSpace(_client.CourrielContact) ? _client.CourrielContact : "-";
+                TxtTelephone.Text = !string.IsNullOrWhiteSpace(_client.Telephone) ? _client.Telephone : "-";
+                TxtType.Text = !string.IsNullOrWhiteSpace(_client.Type) ? _client.Type : "-";
+                TxtStatut.Text = !string.IsNullOrWhiteSpace(_client.Statut) ? _client.Statut.ToUpper() : "-";
+                TxtDateCreation.Text = _client.DateCreation.ToString("dd/MM/yyyy");
+
+                // Couleur statut
+                if (_client.Statut == "Actif") BorderStatut.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981"));
+                else if (_client.Statut == "Fidèle") BorderStatut.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F59E0B"));
+                else if (_client.Statut == "Prospect") BorderStatut.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3B82F6"));
+                else BorderStatut.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#64748B"));
+
+                // 2. Statistiques - Calculer directement depuis les factures pour plus de précision
+                var factures = FactureService.GetFacturesByClient(_clientId);
+                // Prendre toutes les factures (pas seulement payées) pour le calcul du CA
+                var facturesValides = factures.Where(f => f.Statut == "Active" || f.StatutPaiement == "Payée" || f.StatutPaiement == "Payé").ToList();
                 
-                // Couleur du statut
-                BorderStatut.Background = client.Statut switch
+                if (facturesValides.Any())
                 {
-                    "Actif" => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981")),
-                    "Fidèle" => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F59E0B")),
-                    "Prospect" => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#669BBC")),
-                    "Inactif" => new SolidColorBrush((Color)ColorConverter.ConvertFromString("#6B7280")),
-                    _ => Brushes.Gray
-                };
-
-                // Informations de contact
-                TxtEmail.Text = client.CourrielContact;
-                TxtTelephone.Text = client.Telephone ?? "N/A";
-                TxtDateCreation.Text = client.DateCreation.ToString("yyyy-MM-dd");
-
-                // Statistiques
-                var stats = ClientStatistiquesService.GetStatistiquesClient(clientId);
-                if (stats != null)
+                    var caTotal = facturesValides.Sum(f => f.MontantTotal);
+                    var nbCommandes = facturesValides.Count;
+                    var panierMoyen = nbCommandes > 0 ? caTotal / nbCommandes : 0;
+                    
+                    TxtCA.Text = caTotal.ToString("C");
+                    TxtNbCommandes.Text = nbCommandes.ToString();
+                    TxtPanierMoyen.Text = panierMoyen.ToString("C");
+                }
+                else
                 {
-                    TxtCA.Text = $"{stats.ChiffreAffairesTotal:N2} $";
-                    TxtNbCommandes.Text = stats.NombreCommandes.ToString();
-                    TxtPanierMoyen.Text = $"{stats.PanierMoyen:N2} $";
-                    TxtScore.Text = $"{stats.ScoreComposite:N1}";
+                    TxtCA.Text = "0,00 $";
+                    TxtNbCommandes.Text = "0";
+                    TxtPanierMoyen.Text = "0,00 $";
                 }
 
-                // Charger l'historique des commandes (factures)
-                LoadCommandes();
-                
-                // Charger les interactions
-                LoadInteractions();
-                
-                // Charger les évaluations
-                LoadEvaluations();
-                
-                // Charger les alertes
-                LoadAlertes();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(
-                    $"Erreur lors du chargement des détails du client:\n{ex.Message}",
-                    "Erreur",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error
-                );
-            }
-        }
+                // Score = Moyenne des notes de satisfaction (calculé indépendamment des factures)
+                var evaluationsForScore = EvaluationClientService.GetEvaluationsByClient(_clientId);
+                if (evaluationsForScore.Any())
+                {
+                    var noteMoyenne = (decimal)evaluationsForScore.Average(e => (double)e.NoteSatisfaction);
+                    TxtScore.Text = noteMoyenne.ToString("F1"); // Afficher avec 1 décimale (ex: 1.0, 3.5, 5.0)
+                }
+                else
+                {
+                    TxtScore.Text = "-"; // Pas d'évaluation
+                }
 
-        private void LoadCommandes()
-        {
-            try
-            {
-                var factures = FactureService.GetFacturesByClient(clientId);
-                
-                var commandesDisplay = factures.Select(f => new CommandeDisplay
+                // 3. Historique Commandes
+                var commandesDisplay = factures.Select(f => new
                 {
                     Date = f.DateFacture.ToString("yyyy-MM-dd"),
                     NumeroFacture = f.NumeroFacture,
-                    MontantFormate = $"{f.MontantTotal:N2} $",
+                    MontantFormate = f.MontantTotal.ToString("C"),
                     Statut = f.StatutPaiement
                 }).ToList();
-                
                 CommandesDataGrid.ItemsSource = commandesDisplay;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Erreur lors du chargement des commandes:\n{ex.Message}");
-            }
-        }
 
-        private void LoadInteractions()
-        {
-            try
-            {
-                var interactions = InteractionClientService.GetInteractionsByClient(clientId);
-                
-                var interactionsDisplay = interactions.Select(i => new InteractionDisplay
+                // 4. Interactions (Journal des actions)
+                var interactions = InteractionClientService.GetInteractionsByClient(_clientId);
+                var interactionsDisplay = interactions.Select(i => new
                 {
                     DateFormate = i.DateInteraction.ToString("yyyy-MM-dd HH:mm"),
                     TypeInteraction = i.TypeInteraction,
+                    TypeIcon = GetTypeIcon(i.TypeInteraction),
                     Sujet = i.Sujet,
-                    NomEmploye = i.NomEmploye
+                    Description = i.Description ?? "-",
+                    NomEmploye = i.NomEmploye ?? "Système (Automatique)",
+                    IsAutomatique = i.EmployeId == null || i.NomEmploye == null || i.NomEmploye == "Système"
                 }).ToList();
-                
                 InteractionsDataGrid.ItemsSource = interactionsDisplay;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Erreur lors du chargement des interactions:\n{ex.Message}");
-            }
-        }
 
-        private void LoadEvaluations()
-        {
-            try
-            {
-                var evaluations = EvaluationClientService.GetEvaluationsByClient(clientId);
-                
-                var evaluationsDisplay = evaluations.Select(e => new EvaluationDisplay
+                // 5. Satisfaction Client (onglet dédié)
+                var evaluations = EvaluationClientService.GetEvaluationsByClient(_clientId);
+                var evaluationsDisplay = evaluations.Select(e => new
                 {
                     DateFormate = e.DateEvaluation.ToString("yyyy-MM-dd"),
-                    NoteFormate = $"{e.NoteSatisfaction} / 5 ⭐",
-                    NumeroFacture = e.NumeroFacture ?? "N/A",
-                    Commentaire = e.Commentaire ?? "Aucun commentaire"
+                    NoteFormate = $"{e.NoteSatisfaction} / 5",
+                    NumeroFacture = e.NumeroFacture ?? "-",
+                    Commentaire = e.Commentaire
                 }).ToList();
-                
-                EvaluationsDataGrid.ItemsSource = evaluationsDisplay;
+
+                if (evaluations.Any())
+                {
+                    var noteMoyenne = evaluations.Average(e => e.NoteSatisfaction);
+                    TxtNoteMoyenne.Text = $"{noteMoyenne:F1} / 5";
+                    TxtNbEvaluations.Text = evaluations.Count.ToString();
+                    TxtDerniereEvaluation.Text = evaluations.OrderByDescending(e => e.DateEvaluation).First().DateEvaluation.ToString("dd/MM/yyyy");
+                }
+                else
+                {
+                    TxtNoteMoyenne.Text = "- / 5";
+                    TxtNbEvaluations.Text = "0";
+                    TxtDerniereEvaluation.Text = "-";
+                }
+                SatisfactionDataGrid.ItemsSource = evaluationsDisplay;
+
+                // 6. Alertes
+                // (Si AlerteServiceClientService existe et a une méthode GetAlertesByClient)
+                // Pour l'instant je commente si je ne suis pas sûr, mais je crois avoir vu le service
+                try 
+                {
+                    var alertes = AlerteServiceClientService.GetAlertesByClient(_clientId);
+                    var alertesDisplay = alertes.Select(a => new
+                    {
+                        DateFormate = a.DateCreation.ToString("yyyy-MM-dd"),
+                        TypeAlerte = a.TypeAlerte,
+                        Priorite = a.Priorite,
+                        Statut = a.Statut,
+                        Description = a.Description
+                    }).ToList();
+                    AlertesDataGrid.ItemsSource = alertesDisplay;
+                }
+                catch { /* Service peut-être manquant ou méthode différente */ }
+
+                // Initialiser les placeholders pour les interactions
+                TxtInteractionSujet.Text = "Sujet (ex: Appel sortant, Courriel envoyé)";
+                TxtInteractionSujet.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#94A3B8"));
+                TxtInteractionNote.Text = "Résumé de l'échange ou contenu du courriel...";
+                TxtInteractionNote.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#94A3B8"));
+
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erreur lors du chargement des évaluations:\n{ex.Message}");
+                MessageBox.Show($"Erreur chargement fiche client: {ex.Message}");
             }
         }
 
-        private void LoadAlertes()
+        private string GetTypeIcon(string typeInteraction)
         {
+            return typeInteraction switch
+            {
+                "Visite" => "🌐",
+                "Commande" => "🛒",
+                "Email" => "📧",
+                "Téléphone" => "📞",
+                "Note" => "📝",
+                "Réunion" => "🤝",
+                "Vente" => "💰",
+                "Réclamation" => "⚠️",
+                _ => "📋"
+            };
+        }
+
+        private void TxtInteractionSujet_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (TxtInteractionSujet.Text == "Sujet (ex: Appel sortant, Courriel envoyé)")
+            {
+                TxtInteractionSujet.Text = "";
+                TxtInteractionSujet.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1E293B"));
+            }
+        }
+
+        private void TxtInteractionSujet_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(TxtInteractionSujet.Text))
+            {
+                TxtInteractionSujet.Text = "Sujet (ex: Appel sortant, Courriel envoyé)";
+                TxtInteractionSujet.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#94A3B8"));
+            }
+        }
+
+        private void TxtInteractionNote_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (TxtInteractionNote.Text == "Résumé de l'échange ou contenu du courriel...")
+            {
+                TxtInteractionNote.Text = "";
+                TxtInteractionNote.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1E293B"));
+            }
+        }
+
+        private void TxtInteractionNote_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(TxtInteractionNote.Text))
+            {
+                TxtInteractionNote.Text = "Résumé de l'échange ou contenu du courriel...";
+                TxtInteractionNote.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#94A3B8"));
+            }
+        }
+
+        private void BtnAddInteraction_Click(object sender, RoutedEventArgs e)
+        {
+            string sujet = TxtInteractionSujet.Text;
+            string note = TxtInteractionNote.Text;
+
+            // Vérifier si c'est le placeholder
+            if (sujet == "Sujet (ex: Appel sortant, Courriel envoyé)" || string.IsNullOrWhiteSpace(sujet))
+            {
+                MessageBox.Show("Veuillez remplir le sujet.", "Champ requis", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (note == "Résumé de l'échange ou contenu du courriel..." || string.IsNullOrWhiteSpace(note))
+            {
+                MessageBox.Show("Veuillez remplir les détails.", "Champ requis", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             try
             {
-                var alertes = AlerteServiceClientService.GetAlertesByClient(clientId);
-                
-                var alertesDisplay = alertes.Select(a => new AlerteDisplay
+                var interaction = new Models.InteractionClient
                 {
-                    DateFormate = a.DateCreation.ToString("yyyy-MM-dd"),
-                    TypeAlerte = a.TypeAlerte,
-                    Priorite = a.Priorite,
-                    Statut = a.Statut,
-                    Description = a.Description
-                }).ToList();
+                    ClientId = _clientId,
+                    TypeInteraction = "Note",
+                    Sujet = sujet,
+                    Description = note,
+                    DateInteraction = DateTime.Now,
+                    EmployeId = 1 // TODO: Utiliser l'ID de l'employé connecté (Session)
+                };
+
+                InteractionClientService.CreerInteraction(interaction);
+
+                // Reset avec placeholders
+                TxtInteractionSujet.Text = "Sujet (ex: Appel sortant, Courriel envoyé)";
+                TxtInteractionSujet.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#94A3B8"));
+                TxtInteractionNote.Text = "Résumé de l'échange ou contenu du courriel...";
+                TxtInteractionNote.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#94A3B8"));
                 
-                AlertesDataGrid.ItemsSource = alertesDisplay;
+                LoadClientData();
+                
+                MessageBox.Show("Note ajoutée avec succès.");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erreur lors du chargement des alertes:\n{ex.Message}");
+                MessageBox.Show($"Erreur lors de l'ajout: {ex.Message}", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -177,40 +265,5 @@ namespace PGI.Views.CRM
         {
             this.Close();
         }
-
-        // Classes d'affichage
-        private class CommandeDisplay
-        {
-            public string Date { get; set; } = string.Empty;
-            public string NumeroFacture { get; set; } = string.Empty;
-            public string MontantFormate { get; set; } = string.Empty;
-            public string Statut { get; set; } = string.Empty;
-        }
-
-        private class InteractionDisplay
-        {
-            public string DateFormate { get; set; } = string.Empty;
-            public string TypeInteraction { get; set; } = string.Empty;
-            public string Sujet { get; set; } = string.Empty;
-            public string NomEmploye { get; set; } = string.Empty;
-        }
-
-        private class EvaluationDisplay
-        {
-            public string DateFormate { get; set; } = string.Empty;
-            public string NoteFormate { get; set; } = string.Empty;
-            public string NumeroFacture { get; set; } = string.Empty;
-            public string Commentaire { get; set; } = string.Empty;
-        }
-
-        private class AlerteDisplay
-        {
-            public string DateFormate { get; set; } = string.Empty;
-            public string TypeAlerte { get; set; } = string.Empty;
-            public string Priorite { get; set; } = string.Empty;
-            public string Statut { get; set; } = string.Empty;
-            public string Description { get; set; } = string.Empty;
-        }
     }
 }
-

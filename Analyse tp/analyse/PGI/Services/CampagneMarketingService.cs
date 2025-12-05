@@ -99,6 +99,31 @@ namespace PGI.Services
         }
 
         /// <summary>
+        /// Supprimer une campagne
+        /// </summary>
+        public static bool SupprimerCampagne(int campagneId)
+        {
+            try
+            {
+                using (var conn = DatabaseHelper.GetConnection())
+                {
+                    conn.Open();
+                    string query = "DELETE FROM campagnes_marketing WHERE id = @id";
+                    
+                    using (var cmd = new MySqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@id", campagneId);
+                        return cmd.ExecuteNonQuery() > 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erreur lors de la suppression de la campagne: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
         /// Clôturer une campagne (calcule automatiquement le taux de participation)
         /// </summary>
         public static bool CloturerCampagne(int campagneId)

@@ -11,12 +11,32 @@ namespace PGI.Views.Finances
     public partial class ProductSelectionForPurchaseWindow : Window
     {
         private List<ProductDisplay> allProducts;
+        private int? fournisseurId;
         public Produit? SelectedProduct { get; private set; }
         public int Quantite { get; private set; }
 
-        public ProductSelectionForPurchaseWindow()
+        public ProductSelectionForPurchaseWindow(int? fournisseurId = null)
         {
             InitializeComponent();
+            this.fournisseurId = fournisseurId;
+            
+            // Mettre à jour le titre si un fournisseur est spécifié
+            if (fournisseurId.HasValue)
+            {
+                try
+                {
+                    var fournisseur = FournisseurService.GetFournisseurById(fournisseurId.Value);
+                    if (fournisseur != null)
+                    {
+                        this.Title = $"Sélectionner un produit - {fournisseur.Nom}";
+                    }
+                }
+                catch
+                {
+                    // Ignorer l'erreur, garder le titre par défaut
+                }
+            }
+            
             LoadProducts();
         }
 
@@ -26,8 +46,15 @@ namespace PGI.Views.Finances
             {
                 var produits = ProduitService.GetAllProduits();
                 
-                allProducts = produits
-                    .Where(p => p.Statut == "Actif")
+                // Filtrer par fournisseur si spécifié
+                var produitsFiltres = produits.Where(p => p.Statut == "Actif");
+                
+                if (fournisseurId.HasValue)
+                {
+                    produitsFiltres = produitsFiltres.Where(p => p.FournisseurId == fournisseurId.Value);
+                }
+                
+                allProducts = produitsFiltres
                     .Select(p => new ProductDisplay
                     {
                         Id = p.Id,
@@ -41,6 +68,19 @@ namespace PGI.Views.Finances
                     .ToList();
                 
                 ProductsDataGrid.ItemsSource = allProducts;
+                
+                // Afficher un message si aucun produit n'est disponible
+                if (allProducts.Count == 0 && fournisseurId.HasValue)
+                {
+                    var fournisseur = FournisseurService.GetFournisseurById(fournisseurId.Value);
+                    var nomFournisseur = fournisseur?.Nom ?? "ce fournisseur";
+                    MessageBox.Show(
+                        $"Aucun produit actif disponible pour {nomFournisseur}.",
+                        "Information",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information
+                    );
+                }
             }
             catch (Exception ex)
             {
@@ -62,6 +102,7 @@ namespace PGI.Views.Finances
             
             if (string.IsNullOrEmpty(searchText))
             {
+                // Si un fournisseur est sélectionné, les produits sont déjà filtrés
                 ProductsDataGrid.ItemsSource = allProducts;
             }
             else

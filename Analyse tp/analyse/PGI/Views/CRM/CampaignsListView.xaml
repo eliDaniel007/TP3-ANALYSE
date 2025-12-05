@@ -40,11 +40,125 @@
                 </Button>
             </Grid>
             
-            <Border Background="White" CornerRadius="10" Padding="30">
-                <TextBlock Text="(Tableau des campagnes : Nom, Date début, Date fin, Statut, Taux de réponse)" 
-                         FontSize="14" 
-                         Foreground="#64748B"
-                         TextWrapping="Wrap"/>
+            <Border Background="White" CornerRadius="10" BorderBrush="#E2E8F0" BorderThickness="1">
+                <DataGrid x:Name="CampaignsDataGrid" 
+                          AutoGenerateColumns="False" 
+                          RowHeight="50"
+                          HeadersVisibility="Column"
+                          GridLinesVisibility="None"
+                          Background="Transparent"
+                          BorderThickness="0"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          IsReadOnly="True"
+                          SelectionMode="Single"
+                          FontSize="13">
+                    <DataGrid.ColumnHeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#F8FAFC"/>
+                            <Setter Property="Foreground" Value="#64748B"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="FontSize" Value="12"/>
+                            <Setter Property="Padding" Value="20,15"/>
+                            <Setter Property="BorderThickness" Value="0,0,0,2"/>
+                            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+                        </Style>
+                    </DataGrid.ColumnHeaderStyle>
+                    <DataGrid.RowStyle>
+                        <Style TargetType="DataGridRow">
+                            <Setter Property="Background" Value="White"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#F8FAFC"/>
+                                    <Setter Property="Cursor" Value="Hand"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.RowStyle>
+                    <DataGrid.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="Padding" Value="20,0"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="DataGridCell">
+                                        <Border Padding="{TemplateBinding Padding}" 
+                                                Background="{TemplateBinding Background}">
+                                            <ContentPresenter VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGrid.CellStyle>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Nom de la campagne" Binding="{Binding NomCampagne}" Width="*"/>
+                        <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="120"/>
+                        <DataGridTextColumn Header="Date début" Binding="{Binding DateDebutFormate}" Width="120"/>
+                        <DataGridTextColumn Header="Date fin" Binding="{Binding DateFinFormate}" Width="120"/>
+                        <DataGridTextColumn Header="Budget" Binding="{Binding BudgetFormate}" Width="120"/>
+                        <DataGridTextColumn Header="Destinataires" Binding="{Binding NombreDestinataires}" Width="100"/>
+                        <DataGridTextColumn Header="Réponses" Binding="{Binding NombreReponses}" Width="100"/>
+                        <DataGridTextColumn Header="Taux" Binding="{Binding TauxParticipationFormate}" Width="100"/>
+                        <DataGridTemplateColumn Header="Statut" Width="120">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border Background="{Binding StatutColor}" 
+                                            CornerRadius="12" 
+                                            Padding="8,4"
+                                            HorizontalAlignment="Center">
+                                        <TextBlock Text="{Binding Statut}" 
+                                                 Foreground="White" 
+                                                 FontSize="11" 
+                                                 FontWeight="SemiBold"/>
+                                    </Border>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Actions" Width="190">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <Button Content="✏️" 
+                                                Width="30" Height="30" 
+                                                Background="Transparent" 
+                                                BorderThickness="0"
+                                                Cursor="Hand"
+                                                ToolTip="Modifier"
+                                                Margin="2"
+                                                Click="BtnEdit_Click"/>
+                                        <Button Content="📊" 
+                                                Width="30" Height="30" 
+                                                Background="Transparent" 
+                                                BorderThickness="0"
+                                                Cursor="Hand"
+                                                ToolTip="Détails"
+                                                Margin="2"
+                                                Click="BtnDetails_Click"/>
+                                        <Button Content="✅" 
+                                                Width="30" Height="30" 
+                                                Background="Transparent" 
+                                                BorderThickness="0"
+                                                Cursor="Hand"
+                                                ToolTip="Clôturer"
+                                                Foreground="#10B981"
+                                                Margin="2"
+                                                Click="BtnCloturer_Click"/>
+                                        <Button Content="🗑️" 
+                                                Width="30" Height="30" 
+                                                Background="Transparent" 
+                                                BorderThickness="0"
+                                                Cursor="Hand"
+                                                ToolTip="Supprimer"
+                                                Foreground="#EF4444"
+                                                Margin="2"
+                                                Click="BtnDelete_Click"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
             </Border>
         </StackPanel>
     </Grid>

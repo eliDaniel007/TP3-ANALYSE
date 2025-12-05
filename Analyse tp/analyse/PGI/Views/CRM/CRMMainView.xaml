@@ -60,6 +60,10 @@
                         Content="📢 Campagnes" 
                         Style="{StaticResource SubNavButtonStyle}"
                         Click="BtnCampaigns_Click"/>
+                <Button x:Name="BtnSatisfaction" 
+                        Content="⭐ Satisfaction" 
+                        Style="{StaticResource SubNavButtonStyle}"
+                        Click="BtnSatisfaction_Click"/>
             </StackPanel>
         </Border>
 

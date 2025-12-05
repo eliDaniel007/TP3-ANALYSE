@@ -27,12 +27,10 @@ namespace PGI.Views.Finances
             LoadView("Views/Finances/FinancesDashboardView.xaml");
         }
 
-        // Navigation vers Commandes Client
+        // Navigation vers Ventes/Factures
         private void BtnSales_Click(object sender, RoutedEventArgs e)
         {
             SetActiveSubNavButton(BtnSales);
-            // Utiliser une vue spécifique pour les commandes clients
-            // Pour l'instant, SalesListView est utilisé mais devrait être renommé ou adapté
             LoadView("Views/Finances/SalesListView.xaml");
         }
 
@@ -43,13 +41,11 @@ namespace PGI.Views.Finances
             LoadView("Views/Finances/PurchasesListView.xaml");
         }
 
-        // Navigation vers Facturation
-        private void BtnInvoices_Click(object sender, RoutedEventArgs e)
+        // Navigation vers Dépenses
+        private void BtnExpenses_Click(object sender, RoutedEventArgs e)
         {
-            SetActiveSubNavButton(BtnInvoices);
-            // Pour l'instant on réutilise SalesListView qui affiche les factures
-            // Idéalement on aurait une InvoicesListView séparée
-            LoadView("Views/Finances/SalesListView.xaml"); 
+            SetActiveSubNavButton(BtnExpenses);
+            LoadView("Views/Finances/ExpensesView.xaml");
         }
 
         // Navigation vers Journal Comptable
@@ -74,10 +70,41 @@ namespace PGI.Views.Finances
         }
 
         // Navigation vers le formulaire d'achat
-        public void NavigateToPurchaseForm()
+        public void NavigateToPurchaseForm(int? commandeId = null)
         {
             SetActiveSubNavButton(BtnPurchases);
-            LoadView("Views/Finances/PurchaseFormView.xaml");
+            if (commandeId.HasValue)
+            {
+                // Charger le formulaire avec la commande à éditer
+                try
+                {
+                    var constructor = typeof(PurchaseFormView).GetConstructor(new[] { typeof(int) });
+                    if (constructor != null)
+                    {
+                        var control = (PurchaseFormView)constructor.Invoke(new object[] { commandeId.Value });
+                        SubContentArea.Content = control;
+                    }
+                    else
+                    {
+                        SubContentArea.Content = new TextBlock { Text = "Erreur de chargement : constructeur introuvable" };
+                    }
+                }
+                catch (Exception ex)
+                {
+                    SubContentArea.Content = new TextBlock { Text = $"Erreur de chargement : {ex.Message}" };
+                }
+            }
+            else
+            {
+                LoadView("Views/Finances/PurchaseFormView.xaml");
+            }
+        }
+
+        // Navigation vers Rapports (méthode publique pour accès depuis le dashboard)
+        public void NavigateToReports()
+        {
+            SetActiveSubNavButton(BtnReports);
+            LoadView("Views/Finances/ReportsView.xaml");
         }
 
         // Méthodes utilitaires
@@ -127,4 +154,3 @@ namespace PGI.Views.Finances
         }
     }
 }
-

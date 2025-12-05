@@ -332,6 +332,51 @@ namespace PGI.Services
         }
 
         /// <summary>
+        /// Obtenir une facture par numéro de facture
+        /// </summary>
+        public static Facture? GetFactureByNumero(string numeroFacture)
+        {
+            Facture? facture = null;
+
+            try
+            {
+                using (var conn = DatabaseHelper.GetConnection())
+                {
+                    conn.Open();
+                    
+                    string queryFacture = @"
+                        SELECT 
+                            f.*,
+                            c.nom AS nom_client,
+                            c.courriel_contact AS courriel_client,
+                            CONCAT(e.prenom, ' ', e.nom) AS nom_vendeur
+                        FROM factures f
+                        INNER JOIN clients c ON f.client_id = c.id
+                        LEFT JOIN employes e ON f.employe_id = e.id
+                        WHERE f.numero_facture = @numero";
+                    
+                    using (var cmd = new MySqlCommand(queryFacture, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@numero", numeroFacture);
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                facture = MapFactureFromReader(reader);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erreur lors de la récupération de la facture: {ex.Message}", ex);
+            }
+
+            return facture;
+        }
+
+        /// <summary>
         /// Obtenir une facture par ID avec ses lignes
         /// </summary>
         public static Facture? GetFactureById(int id)

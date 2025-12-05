@@ -42,7 +42,7 @@ namespace PGI.Services
         {
             // Produits dont qte <= seuil
             string query = @"
-                SELECT p.sku, p.nom, ns.qte_disponible, p.seuil_reapprovisionnement
+                SELECT p.id, p.sku, p.nom, ns.qte_disponible, p.seuil_reapprovisionnement, p.cout, p.fournisseur_id
                 FROM produits p
                 JOIN niveaux_stock ns ON p.id = ns.produit_id
                 WHERE ns.qte_disponible <= p.seuil_reapprovisionnement";
@@ -79,58 +79,66 @@ namespace PGI.Services
 
         public static decimal GetVentesTotales(DateTime debut, DateTime fin)
         {
+            // Ventes = Toutes les factures non annulées dans la période (peu importe le statut de paiement)
+            // Utiliser DATE() pour comparer seulement les dates sans l'heure
             string query = @"
                 SELECT COALESCE(SUM(montant_total), 0) 
                 FROM factures 
-                WHERE date_facture BETWEEN @debut AND @fin";
+                WHERE DATE(date_facture) BETWEEN DATE(@debut) AND DATE(@fin)
+                AND statut != 'Annulée'";
             
             var parameters = new Dictionary<string, object>
             {
-                { "@debut", debut },
-                { "@fin", fin }
+                { "@debut", debut.ToString("yyyy-MM-dd") },
+                { "@fin", fin.ToString("yyyy-MM-dd") }
             };
             return Convert.ToDecimal(DatabaseHelper.ExecuteScalar(query, parameters));
         }
 
         public static decimal GetDepensesExploitation(DateTime debut, DateTime fin)
         {
-            // Simplification: Salaires + Achats Fournisseurs
-            // 1. Achats fournisseurs
-            string queryAchats = @"
-                SELECT COALESCE(SUM(montant_total), 0) 
-                FROM commandes_achat 
-                WHERE date_commande BETWEEN @debut AND @fin";
-            
-            // 2. Salaires (Si table salaires existe, sinon simulation ou 0)
-            // On va supposer 0 pour l'instant ou une valeur fixe mensuelle si pas de table
-            // Vérifions s'il y a une table paie/salaires dans une prochaine étape, pour l'instant Achats uniquement.
-            
+            // Dépenses = Achats Fournisseurs + Dépenses générales
             var parameters = new Dictionary<string, object>
             {
                 { "@debut", debut },
                 { "@fin", fin }
             };
             
-            decimal achats = Convert.ToDecimal(DatabaseHelper.ExecuteScalar(queryAchats, parameters));
-            decimal salairesEstimes = 0; // À implémenter si module RH connecté
+            // 1. Achats fournisseurs (commandes reçues)
+            string queryAchats = @"
+                SELECT COALESCE(SUM(montant_total), 0) 
+                FROM commandes_fournisseurs 
+                WHERE DATE(date_commande) BETWEEN DATE(@debut) AND DATE(@fin)
+                AND statut != 'Annulée'";
             
-            return achats + salairesEstimes;
+            decimal achats = Convert.ToDecimal(DatabaseHelper.ExecuteScalar(queryAchats, parameters));
+            
+            // 2. Dépenses générales (table depenses)
+            string queryDepenses = @"
+                SELECT COALESCE(SUM(montant), 0) 
+                FROM depenses 
+                WHERE DATE(date_depense) BETWEEN DATE(@debut) AND DATE(@fin)";
+            
+            decimal depensesGenerales = Convert.ToDecimal(DatabaseHelper.ExecuteScalar(queryDepenses, parameters));
+            
+            return achats + depensesGenerales;
         }
 
         public static decimal GetCoutMarchandisesVendues(DateTime debut, DateTime fin)
         {
-            // Estimation: Somme des (Cout Unitaire * Quantité) des lignes de factures sur la période
+            // Coût des marchandises vendues = Coût des produits vendus dans toutes les factures non annulées
             string query = @"
                 SELECT COALESCE(SUM(lf.quantite * p.cout), 0)
                 FROM lignes_factures lf
                 JOIN factures f ON lf.facture_id = f.id
                 JOIN produits p ON lf.produit_id = p.id
-                WHERE f.date_facture BETWEEN @debut AND @fin";
+                WHERE DATE(f.date_facture) BETWEEN DATE(@debut) AND DATE(@fin)
+                AND f.statut != 'Annulée'";
             
             var parameters = new Dictionary<string, object>
             {
-                { "@debut", debut },
-                { "@fin", fin }
+                { "@debut", debut.ToString("yyyy-MM-dd") },
+                { "@fin", fin.ToString("yyyy-MM-dd") }
             };
             return Convert.ToDecimal(DatabaseHelper.ExecuteScalar(query, parameters));
         }
@@ -138,7 +146,10 @@ namespace PGI.Services
         public static DataTable GetFacturesEnAttente()
         {
             string query = @"
-                SELECT f.numero_facture, c.nom AS client, f.montant_total, f.montant_paye, f.montant_du
+                SELECT 
+                    f.numero_facture AS numero_facture,
+                    c.nom AS client,
+                    f.montant_du AS montant_du
                 FROM factures f
                 JOIN clients c ON f.client_id = c.id
                 WHERE f.montant_du > 0 AND f.statut != 'Annulée'
@@ -186,17 +197,30 @@ namespace PGI.Services
 
         public static DataTable GetDernieresTransactions()
         {
-            // Extrait journal comptable : Ventes (Factures) + Achats (Commandes Fournisseurs)
+            // Extrait journal comptable : Ventes (Factures) + Achats (Commandes Fournisseurs) + Dépenses
             string query = @"
-                SELECT 'Vente' as type, f.numero_facture as reference, c.nom as tiers, f.date_facture as date_transaction, f.montant_total as montant, 'Crédit' as sens
+                SELECT 
+                    'Vente' as type, 
+                    f.date_facture as date_transaction, 
+                    f.montant_total as montant, 
+                    'Crédit' as sens
                 FROM factures f
-                JOIN clients c ON f.client_id = c.id
                 WHERE f.statut != 'Annulée'
                 UNION ALL
-                SELECT 'Achat' as type, ca.numero_commande as reference, f.nom as tiers, ca.date_commande as date_transaction, ca.montant_total as montant, 'Débit' as sens
-                FROM commandes_achat ca
-                JOIN fournisseurs f ON ca.fournisseur_id = f.id
-                WHERE ca.statut != 'Annulée'
+                SELECT 
+                    'Achat' as type, 
+                    cf.date_commande as date_transaction, 
+                    cf.montant_total as montant, 
+                    'Débit' as sens
+                FROM commandes_fournisseurs cf
+                WHERE cf.statut != 'Annulée'
+                UNION ALL
+                SELECT 
+                    'Dépense' as type, 
+                    d.date_depense as date_transaction, 
+                    d.montant as montant, 
+                    'Débit' as sens
+                FROM depenses d
                 ORDER BY date_transaction DESC
                 LIMIT 10";
             

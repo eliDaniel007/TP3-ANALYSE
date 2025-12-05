@@ -108,7 +108,8 @@
                          Foreground="#94A3B8"
                          Margin="0,0,15,0"
                          GotFocus="TxtSearch_GotFocus"
-                         LostFocus="TxtSearch_LostFocus"/>
+                         LostFocus="TxtSearch_LostFocus"
+                         TextChanged="TxtSearch_TextChanged"/>
 
                 <!-- Filtre par statut -->
                 <ComboBox x:Name="CmbStatusFilter" 
@@ -215,22 +216,56 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <Button Content="✏️" 
+                                    <Button x:Name="BtnEdit" Content="✏️" 
                                             Width="30" Height="30" 
                                             Background="Transparent" 
                                             BorderThickness="0"
                                             Cursor="Hand"
                                             ToolTip="Modifier"
                                             Margin="2"
-                                            Click="BtnEdit_Click"/>
-                                    <Button Content="💳" 
+                                            Click="BtnEdit_Click">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Statut}" Value="Payée">
+                                                        <Setter Property="IsEnabled" Value="False"/>
+                                                        <Setter Property="Opacity" Value="0.4"/>
+                                                        <Setter Property="ToolTip" Value="Impossible de modifier une facture payée"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Statut}" Value="Annulée">
+                                                        <Setter Property="IsEnabled" Value="False"/>
+                                                        <Setter Property="Opacity" Value="0.4"/>
+                                                        <Setter Property="ToolTip" Value="Impossible de modifier une facture annulée"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                    <Button x:Name="BtnPayment" Content="💳" 
                                             Width="30" Height="30" 
                                             Background="Transparent" 
                                             BorderThickness="0"
                                             Cursor="Hand"
                                             ToolTip="Enregistrer un paiement"
                                             Margin="2"
-                                            Click="BtnPayment_Click"/>
+                                            Click="BtnPayment_Click">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Statut}" Value="Payée">
+                                                        <Setter Property="IsEnabled" Value="False"/>
+                                                        <Setter Property="Opacity" Value="0.4"/>
+                                                        <Setter Property="ToolTip" Value="Cette facture est déjà payée"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Statut}" Value="Annulée">
+                                                        <Setter Property="IsEnabled" Value="False"/>
+                                                        <Setter Property="Opacity" Value="0.4"/>
+                                                        <Setter Property="ToolTip" Value="Impossible d'enregistrer un paiement pour une facture annulée"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
                                     <Button Content="💸" 
                                             Width="30" Height="30" 
                                             Background="Transparent" 
@@ -248,7 +283,19 @@
                                             ToolTip="Annuler"
                                             Foreground="#DC2626"
                                             Margin="2"
-                                            Click="BtnCancel_Click"/>
+                                            Click="BtnCancel_Click">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Statut}" Value="Annulée">
+                                                        <Setter Property="IsEnabled" Value="False"/>
+                                                        <Setter Property="Opacity" Value="0.4"/>
+                                                        <Setter Property="ToolTip" Value="Cette facture est déjà annulée"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
                                 </StackPanel>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>

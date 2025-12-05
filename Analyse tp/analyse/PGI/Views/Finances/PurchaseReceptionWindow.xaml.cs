@@ -97,7 +97,8 @@ namespace PGI.Views.Finances
                 // Confirmation
                 var result = MessageBox.Show(
                     $"Confirmer la réception de {quantitesRecues.Count} produit(s) ?\n\n" +
-                    "Le stock sera automatiquement mis à jour.",
+                    "Actions automatiques :\n" +
+                    "1. Mise à jour du stock.\n2. Création ou mise à jour de la facture fournisseur.",
                     "Confirmation",
                     MessageBoxButton.YesNo,
                     MessageBoxImage.Question
@@ -164,4 +165,3 @@ namespace PGI.Views.Finances
         }
     }
 }
-

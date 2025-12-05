@@ -442,6 +442,19 @@ CREATE TABLE IF NOT EXISTS alertes_service_client (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 COMMENT='Alertes et tickets du service client';
 
+-- Table: depenses
+CREATE TABLE IF NOT EXISTS depenses (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    description VARCHAR(255) NOT NULL,
+    categorie ENUM('Loyer', 'Électricité', 'Internet', 'Assurance', 'Marketing', 'Fournitures Bureau', 'Salaires', 'Autre') NOT NULL,
+    montant DECIMAL(10, 2) NOT NULL,
+    date_depense DATE NOT NULL,
+    statut_paiement ENUM('Payée', 'En attente') DEFAULT 'En attente',
+    mode_paiement VARCHAR(50),
+    date_creation DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='Dépenses générales de l''entreprise';
+
 -- =====================================================
 -- PARTIE 5: VUES CALCULÉES
 -- =====================================================
