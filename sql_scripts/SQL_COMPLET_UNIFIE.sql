@@ -329,7 +329,7 @@ CREATE TABLE IF NOT EXISTS commandes_fournisseurs (
     montant_tvq DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
     montant_total DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
     
-    statut ENUM('En attente', 'Envoyée', 'Partiellement reçue', 'Reçue', 'Annulée') DEFAULT 'En attente',
+    statut ENUM('En attente', 'Envoyée', 'Partiellement reçue', 'Reçue', 'Fermée', 'Annulée') DEFAULT 'En attente',
     note_interne TEXT NULL,
     date_creation DATETIME DEFAULT CURRENT_TIMESTAMP,
     
@@ -454,6 +454,24 @@ CREATE TABLE IF NOT EXISTS depenses (
     date_creation DATETIME DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 COMMENT='Dépenses générales de l''entreprise';
+
+-- Table: journal_comptable
+CREATE TABLE IF NOT EXISTS journal_comptable (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    date_ecriture DATE NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    compte VARCHAR(100) NOT NULL,
+    debit DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+    credit DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+    reference VARCHAR(100) NULL COMMENT 'Numéro de facture, commande, etc.',
+    type_transaction ENUM('Vente', 'Achat', 'Salaire', 'Dépense', 'Autre') NOT NULL DEFAULT 'Autre',
+    date_creation DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_date (date_ecriture),
+    INDEX idx_compte (compte),
+    INDEX idx_type (type_transaction),
+    INDEX idx_reference (reference)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+COMMENT='Journal général comptable - Respecte la partie double (Débit = Crédit)';
 
 -- =====================================================
 -- PARTIE 5: VUES CALCULÉES
@@ -889,6 +907,200 @@ ON DUPLICATE KEY UPDATE qte_disponible = qte_disponible;
 -- - Email (courriel) + Mot de passe en clair
 -- - Pas de hashage dans l'application
 -- =====================================================
+
+-- =====================================================
+-- PARTIE 7: MIGRATION JOURNAL COMPTABLE
+-- =====================================================
+-- Migration des données existantes vers le journal_comptable
+-- Respecte strictement la partie double (Débit = Crédit)
+
+-- 1. MIGRER LES VENTES (Factures)
+-- Règle : Débiter "Comptes Clients", Créditer "Ventes" + "Taxes à payer"
+
+-- Débit : Comptes Clients (Actif)
+INSERT INTO journal_comptable (date_ecriture, description, compte, debit, credit, reference, type_transaction)
+SELECT 
+    DATE(f.date_facture) as date_ecriture,
+    CONCAT('Vente ', f.numero_facture, ' - ', COALESCE(c.nom, 'Client inconnu')) as description,
+    'Comptes Clients' as compte,
+    f.montant_total as debit,
+    0.00 as credit,
+    f.numero_facture as reference,
+    'Vente' as type_transaction
+FROM factures f
+LEFT JOIN clients c ON f.client_id = c.id
+WHERE f.statut != 'Annulée'
+AND NOT EXISTS (
+    SELECT 1 FROM journal_comptable j 
+    WHERE j.reference = f.numero_facture AND j.type_transaction = 'Vente' AND j.compte = 'Comptes Clients'
+);
+
+-- Crédit : Ventes (Revenu)
+INSERT INTO journal_comptable (date_ecriture, description, compte, debit, credit, reference, type_transaction)
+SELECT 
+    DATE(f.date_facture) as date_ecriture,
+    CONCAT('Vente ', f.numero_facture, ' - ', COALESCE(c.nom, 'Client inconnu')) as description,
+    'Ventes' as compte,
+    0.00 as debit,
+    f.sous_total as credit,
+    f.numero_facture as reference,
+    'Vente' as type_transaction
+FROM factures f
+LEFT JOIN clients c ON f.client_id = c.id
+WHERE f.statut != 'Annulée'
+AND NOT EXISTS (
+    SELECT 1 FROM journal_comptable j 
+    WHERE j.reference = f.numero_facture AND j.type_transaction = 'Vente' AND j.compte = 'Ventes'
+);
+
+-- Crédit : Taxes à payer TPS (Passif)
+INSERT INTO journal_comptable (date_ecriture, description, compte, debit, credit, reference, type_transaction)
+SELECT 
+    DATE(f.date_facture) as date_ecriture,
+    CONCAT('TPS - ', f.numero_facture) as description,
+    'Taxes à payer - TPS' as compte,
+    0.00 as debit,
+    f.montant_tps as credit,
+    f.numero_facture as reference,
+    'Vente' as type_transaction
+FROM factures f
+WHERE f.statut != 'Annulée'
+AND f.montant_tps > 0
+AND NOT EXISTS (
+    SELECT 1 FROM journal_comptable j 
+    WHERE j.reference = f.numero_facture AND j.type_transaction = 'Vente' AND j.compte = 'Taxes à payer - TPS'
+);
+
+-- Crédit : Taxes à payer TVQ (Passif)
+INSERT INTO journal_comptable (date_ecriture, description, compte, debit, credit, reference, type_transaction)
+SELECT 
+    DATE(f.date_facture) as date_ecriture,
+    CONCAT('TVQ - ', f.numero_facture) as description,
+    'Taxes à payer - TVQ' as compte,
+    0.00 as debit,
+    f.montant_tvq as credit,
+    f.numero_facture as reference,
+    'Vente' as type_transaction
+FROM factures f
+WHERE f.statut != 'Annulée'
+AND f.montant_tvq > 0
+AND NOT EXISTS (
+    SELECT 1 FROM journal_comptable j 
+    WHERE j.reference = f.numero_facture AND j.type_transaction = 'Vente' AND j.compte = 'Taxes à payer - TVQ'
+);
+
+-- 2. MIGRER LES ACHATS STOCK (Commandes fournisseurs)
+-- Règle : Débiter "Stock", Créditer "Comptes Fournisseurs"
+
+-- Débit : Stock (Actif)
+INSERT INTO journal_comptable (date_ecriture, description, compte, debit, credit, reference, type_transaction)
+SELECT 
+    DATE(cf.date_commande) as date_ecriture,
+    CONCAT('Achat Stock ', cf.numero_commande, ' - ', COALESCE(f.nom, 'Fournisseur inconnu')) as description,
+    'Stock' as compte,
+    cf.montant_total as debit,
+    0.00 as credit,
+    cf.numero_commande as reference,
+    'Achat' as type_transaction
+FROM commandes_fournisseurs cf
+LEFT JOIN fournisseurs f ON cf.fournisseur_id = f.id
+WHERE cf.statut != 'Annulée'
+AND NOT EXISTS (
+    SELECT 1 FROM journal_comptable j 
+    WHERE j.reference = cf.numero_commande AND j.type_transaction = 'Achat' AND j.compte = 'Stock'
+);
+
+-- Crédit : Comptes Fournisseurs (Passif)
+INSERT INTO journal_comptable (date_ecriture, description, compte, debit, credit, reference, type_transaction)
+SELECT 
+    DATE(cf.date_commande) as date_ecriture,
+    CONCAT('Achat Stock ', cf.numero_commande, ' - ', COALESCE(f.nom, 'Fournisseur inconnu')) as description,
+    'Comptes Fournisseurs' as compte,
+    0.00 as debit,
+    cf.montant_total as credit,
+    cf.numero_commande as reference,
+    'Achat' as type_transaction
+FROM commandes_fournisseurs cf
+LEFT JOIN fournisseurs f ON cf.fournisseur_id = f.id
+WHERE cf.statut != 'Annulée'
+AND NOT EXISTS (
+    SELECT 1 FROM journal_comptable j 
+    WHERE j.reference = cf.numero_commande AND j.type_transaction = 'Achat' AND j.compte = 'Comptes Fournisseurs'
+);
+
+-- 3. MIGRER LES DÉPENSES
+-- Règle : Débiter "Dépenses - [catégorie]", Créditer "Banque"
+
+-- Débit : Dépenses par catégorie (Dépense)
+INSERT INTO journal_comptable (date_ecriture, description, compte, debit, credit, reference, type_transaction)
+SELECT 
+    DATE(d.date_depense) as date_ecriture,
+    CONCAT('Dépense: ', d.description) as description,
+    CONCAT('Dépenses - ', d.categorie) as compte,
+    d.montant as debit,
+    0.00 as credit,
+    CONCAT('DEP-', d.id) as reference,
+    'Dépense' as type_transaction
+FROM depenses d
+WHERE NOT EXISTS (
+    SELECT 1 FROM journal_comptable j 
+    WHERE j.reference = CONCAT('DEP-', d.id) AND j.type_transaction = 'Dépense' AND j.debit = d.montant
+);
+
+-- Crédit : Banque (Actif qui diminue)
+INSERT INTO journal_comptable (date_ecriture, description, compte, debit, credit, reference, type_transaction)
+SELECT 
+    DATE(d.date_depense) as date_ecriture,
+    CONCAT('Dépense: ', d.description) as description,
+    'Banque' as compte,
+    0.00 as debit,
+    d.montant as credit,
+    CONCAT('DEP-', d.id) as reference,
+    'Dépense' as type_transaction
+FROM depenses d
+WHERE NOT EXISTS (
+    SELECT 1 FROM journal_comptable j 
+    WHERE j.reference = CONCAT('DEP-', d.id) AND j.type_transaction = 'Dépense' AND j.compte = 'Banque'
+);
+
+-- 4. MIGRER LES SALAIRES
+-- Règle : Débiter "Salaires", Créditer "Banque"
+
+-- Débit : Salaires (Dépense)
+INSERT INTO journal_comptable (date_ecriture, description, compte, debit, credit, reference, type_transaction)
+SELECT 
+    DATE(p.date_creation) as date_ecriture,
+    CONCAT('Paie ', COALESCE(CONCAT(e.prenom, ' ', e.nom), 'Employé inconnu'), ' - ', DATE_FORMAT(p.periode_debut, '%Y-%m-%d'), ' à ', DATE_FORMAT(p.periode_fin, '%Y-%m-%d')) as description,
+    'Salaires' as compte,
+    p.montant_brut as debit,
+    0.00 as credit,
+    CONCAT('PAIE-', p.id) as reference,
+    'Salaire' as type_transaction
+FROM paies p
+LEFT JOIN employes e ON p.employe_id = e.id
+WHERE p.statut_paiement = 'Payé'
+AND NOT EXISTS (
+    SELECT 1 FROM journal_comptable j 
+    WHERE j.reference = CONCAT('PAIE-', p.id) AND j.type_transaction = 'Salaire' AND j.compte = 'Salaires'
+);
+
+-- Crédit : Banque (Actif qui diminue)
+INSERT INTO journal_comptable (date_ecriture, description, compte, debit, credit, reference, type_transaction)
+SELECT 
+    DATE(p.date_creation) as date_ecriture,
+    CONCAT('Paie ', COALESCE(CONCAT(e.prenom, ' ', e.nom), 'Employé inconnu'), ' - ', DATE_FORMAT(p.periode_debut, '%Y-%m-%d'), ' à ', DATE_FORMAT(p.periode_fin, '%Y-%m-%d')) as description,
+    'Banque' as compte,
+    0.00 as debit,
+    p.montant_brut as credit,
+    CONCAT('PAIE-', p.id) as reference,
+    'Salaire' as type_transaction
+FROM paies p
+LEFT JOIN employes e ON p.employe_id = e.id
+WHERE p.statut_paiement = 'Payé'
+AND NOT EXISTS (
+    SELECT 1 FROM journal_comptable j 
+    WHERE j.reference = CONCAT('PAIE-', p.id) AND j.type_transaction = 'Salaire' AND j.compte = 'Banque'
+);
 
 -- =====================================================
 -- FIN DU SCRIPT SQL COMPLET UNIFIÉ

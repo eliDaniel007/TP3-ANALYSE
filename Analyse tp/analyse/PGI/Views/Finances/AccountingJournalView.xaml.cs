@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using PGI.Services;
 
 namespace PGI.Views.Finances
 {
@@ -9,90 +11,58 @@ namespace PGI.Views.Finances
         public AccountingJournalView()
         {
             InitializeComponent();
-            LoadSampleData();
+            // Initialiser avec une période plus large (année en cours) pour avoir des données
+            TxtDateDebut.SelectedDate = new DateTime(DateTime.Now.Year, 1, 1);
+            TxtDateFin.SelectedDate = DateTime.Now;
+            LoadJournalData();
         }
 
-        private void LoadSampleData()
+        private void LoadJournalData()
         {
             try
             {
-                var transactions = PGI.Services.DashboardService.GetDernieresTransactions();
-                var entries = new List<JournalEntry>();
-                double totalDebit = 0;
-                double totalCredit = 0;
+                DateTime dateDebut = TxtDateDebut.SelectedDate ?? new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                DateTime dateFin = TxtDateFin.SelectedDate ?? DateTime.Now;
 
-                foreach (System.Data.DataRow row in transactions.Rows)
-                {
-                    string type = row["type"].ToString();
-                    string reference = row["reference"].ToString();
-                    string tiers = row["tiers"].ToString();
-                    string date = Convert.ToDateTime(row["date_transaction"]).ToString("yyyy-MM-dd");
-                    decimal montant = Convert.ToDecimal(row["montant"]);
-                    
-                    // Écriture 1 (Débit)
-                    var entry1 = new JournalEntry
-                    {
-                        Date = date,
-                        Transaction = $"{type} {reference} ({tiers})",
-                        Compte = type == "Vente" ? "Banque / Clients" : "Achats / Stock",
-                        Debit = type == "Vente" ? "" : montant.ToString("C"), // Achat = Débit Stock
-                        Credit = type == "Vente" ? "" : "" // Attente ligne 2
-                    };
-                    // Ajustement logique Vente = Crédit Ventes, Débit Banque
-                    if (type == "Vente")
-                    {
-                         entry1.Debit = montant.ToString("C");
-                         totalDebit += (double)montant;
-                    }
-                    else
-                    {
-                         entry1.Debit = montant.ToString("C");
-                         totalDebit += (double)montant;
-                    }
-                    entries.Add(entry1);
-
-                    // Écriture 2 (Crédit)
-                    var entry2 = new JournalEntry
-                    {
-                        Date = "",
-                        Transaction = "",
-                        Compte = type == "Vente" ? "Ventes marchandises" : "Banque / Fournisseurs",
-                        Debit = "",
-                        Credit = montant.ToString("C")
-                    };
-                    totalCredit += (double)montant;
-                    entries.Add(entry2);
-                }
-
+                var entries = JournalComptableService.GetJournalEntries(dateDebut, dateFin);
                 JournalDataGrid.ItemsSource = entries;
-                
+
+                var (totalDebit, totalCredit) = JournalComptableService.CalculateTotals(entries);
                 TxtTotalDebit.Text = $"{totalDebit:C}";
                 TxtTotalCredit.Text = $"{totalCredit:C}";
+
+                // Vérifier l'équilibre
+                if (Math.Abs(totalDebit - totalCredit) > 0.01m)
+                {
+                    // Afficher un avertissement si déséquilibré (tolérance de 0.01$ pour arrondis)
+                    TxtTotalDebit.Foreground = new System.Windows.Media.SolidColorBrush(
+                        (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#DC2626"));
+                    TxtTotalCredit.Foreground = new System.Windows.Media.SolidColorBrush(
+                        (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#DC2626"));
+                }
+                else
+                {
+                    TxtTotalDebit.Foreground = new System.Windows.Media.SolidColorBrush(
+                        (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#10B981"));
+                    TxtTotalCredit.Foreground = new System.Windows.Media.SolidColorBrush(
+                        (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#10B981"));
+                }
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                 MessageBox.Show($"Erreur lors du chargement du journal : {ex.Message}", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                // Afficher l'erreur dans la console plutôt qu'un pop-up
+                System.Diagnostics.Debug.WriteLine($"Erreur lors du chargement du journal : {ex.Message}");
+                // Afficher un message dans l'interface
+                JournalDataGrid.ItemsSource = new List<JournalEntryDisplay>();
+                TxtTotalDebit.Text = "0,00 $";
+                TxtTotalCredit.Text = "0,00 $";
             }
         }
 
         private void BtnFilter_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show(
-                "Filtrage par période à implémenter avec la base de données.",
-                "Information",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information
-            );
+            LoadJournalData();
         }
-    }
-
-    public class JournalEntry
-    {
-        public string Date { get; set; } = string.Empty;
-        public string Transaction { get; set; } = string.Empty;
-        public string Compte { get; set; } = string.Empty;
-        public string Debit { get; set; } = string.Empty;
-        public string Credit { get; set; } = string.Empty;
     }
 }
 
